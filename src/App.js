@@ -1,17 +1,27 @@
-// src/App.js
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { AuthProvider } from "./context/AuthContext";
+import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
-// import Settings from "./pages/Settings";
+import ProtectedRoute from "./routes/ProtectedRoute";
 
 const App = () => {
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Dashboard />} />
-        {/* <Route path="/settings" element={<Settings />} /> */}
-      </Routes>
-    </Router>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 };
 
