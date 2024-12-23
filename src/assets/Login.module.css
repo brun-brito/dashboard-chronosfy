@@ -1,0 +1,120 @@
+/* Estilo geral da página */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f3f1f7;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Contêiner principal */
+  .form-container {
+    max-width: 400px;
+    margin: auto;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(43, 5, 72, 0.2);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Título */
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #2b0548;
+  }
+  
+  /* Mensagem de erro */
+  .error-message {
+    color: #d9534f;
+    font-size: 0.9rem;
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+  
+  /* Formulário */
+  form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+  }
+  
+  /* Campos de entrada */
+  input {
+    width: 85%; /* Ajusta o tamanho dos inputs */
+    margin-bottom: 1rem;
+    padding: 0.6rem; /* Reduz o padding */
+    font-size: 0.9rem; /* Reduz o tamanho da fonte */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+  }
+  
+  input:focus {
+    border-color: #2b0548;
+    outline: none;
+    box-shadow: 0 0 4px rgba(43, 5, 72, 0.5);
+  }
+  
+  /* Botão de login */
+  button {
+    background-color: #2b0548;
+    color: white;
+    border: none;
+    padding: 0.8rem;
+    font-size: 1rem;
+    border-radius: 4px;
+    cursor: pointer;
+    width: 85%; /* Mantém o alinhamento com os inputs */
+    transition: background-color 0.3s ease;
+  }
+  
+  button:hover {
+    background-color: #1f0439;
+  }
+  
+  /* Link de cadastro */
+  .register-link {
+    margin-top: 1rem;
+    text-align: center;
+    color: #2b0548;
+    font-size: 0.9rem;
+  }
+  
+  .register-link span {
+    color: #2b0548;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  .register-link span:hover {
+    color: #1f0439;
+  }
+  
+  /* Rodapé */
+  .footer {
+    text-align: center;
+    padding: 1rem 0;
+    background-color: #2b0548;
+    color: white;
+    font-size: 0.8rem;
+    width: 100%; /* Garante que o rodapé preencha a largura */
+    margin-top: auto;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+  }
+  
+  
+  .testeBruno {
+    font-size: 5em;
+  }

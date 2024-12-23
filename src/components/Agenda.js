@@ -21,8 +21,6 @@ const Agenda = ({ events, horarioFuncionamento }) => {
   const getMinMaxTimes = (date) => {
     const day = removeAcentos(moment(date).format("ddd").toLowerCase());
     const horarioHoje = horarioFuncionamento[day] || null;
-    console.log(horarioFuncionamento);
-
     const min = horarioHoje ? moment(horarioHoje[0], "HH:mm").toDate() : moment("08:00", "HH:mm").toDate();
     const max = horarioHoje ? moment(horarioHoje[1], "HH:mm").toDate() : moment("18:00", "HH:mm").toDate();
 
@@ -116,7 +114,7 @@ const Agenda = ({ events, horarioFuncionamento }) => {
         <div style={modalStyles}>
           <div style={modalContentStyles}>
             <h2>Detalhes do Evento</h2>
-            <p>
+            <p className="testeBruno">
               <strong>Cliente:</strong> {selectedEvent.nome || "-"}
             </p>
             <p>

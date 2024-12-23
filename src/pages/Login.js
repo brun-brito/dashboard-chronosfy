@@ -1,32 +1,35 @@
 import React, { useState } from "react";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../services/Firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import styles from "../assets/Login.module.css";
 
 const Login = () => {
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [email, setEmail] = useState(location.state?.email || "");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
-  const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate("/");
+      navigate("/dashboard");
     } catch (err) {
       setError("Credenciais inválidas. Tente novamente.");
     }
   };
 
   return (
-    <div>
+    <div className={styles["page-container"]}>
+    <div className={styles["form-container"]}>
       <h1>Login</h1>
-      {error && <p>{error}</p>}
+      {error && <p className={styles["error-message"]}>{error}</p>}
       <form onSubmit={handleLogin}>
         <input
           type="email"
-          placeholder="Email"
+          placeholder="E-mail"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
@@ -38,7 +41,12 @@ const Login = () => {
         />
         <button type="submit">Entrar</button>
       </form>
+      <p className={styles["register-link"]}>
+        Ainda não possui conta?{" "}
+        <span onClick={() => navigate("/cadastro")}>Cadastrar</span>
+      </p>
     </div>
+  </div>
   );
 };
 
