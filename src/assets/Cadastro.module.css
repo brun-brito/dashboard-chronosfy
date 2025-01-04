@@ -179,3 +179,20 @@ body {
     transition: 0.2s ease;
   }
   
+  .login-link {
+    margin-top: 1rem;
+    text-align: center;
+    color: #2b0548;
+    font-size: 0.9rem;
+  }
+  
+  .login-link span {
+    color: #2b0548;
+    font-weight: bold;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  
+  .login-link span:hover {
+    color: #1f0439;
+  }

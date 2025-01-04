@@ -1,0 +1,73 @@
+/* Estilo do contêiner do loading */
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh; /* Ocupa a tela inteira */
+    background-color: #f3f1f7;
+    color: #2b0548;
+    font-size: 1.2rem;
+  }
+  
+  /* Estilo do spinner */
+  .loading-spinner {
+    width: 50px;
+    height: 50px;
+    border: 6px solid #eaeaea;
+    border-top: 6px solid #2b0548;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin-bottom: 10px;
+  }
+  
+  /* Animação de rotação */
+  @keyframes spin {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Estilo do botão de logout */
+.logout {
+    background-color: #e74c3c; /* Vermelho vibrante */
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  /* Efeito de hover */
+  .logout:hover {
+    background-color: #c0392b; /* Tom mais escuro de vermelho */
+    transform: scale(1.05); /* Leve aumento ao passar o mouse */
+  }
+  
+  /* Efeito de foco */
+  .logout:focus {
+    outline: none;
+    box-shadow: 0 0 8px rgba(231, 76, 60, 0.7); /* Glow vermelho */
+  }
+  
+  /* Estilo para desabilitado */
+  .logout:disabled {
+    background-color: #e0e0e0;
+    color: #8c8c8c;
+    cursor: not-allowed;
+  }
+  
+  /* Responsividade */
+  @media (max-width: 768px) {
+    .logout {
+      font-size: 0.9rem; /* Reduzir tamanho da fonte em telas menores */
+      padding: 8px 16px; /* Ajustar padding */
+    }
+  }
+  

@@ -49,10 +49,10 @@ body {
   
   /* Campos de entrada */
   input {
-    width: 85%; /* Ajusta o tamanho dos inputs */
+    width: 85%;
     margin-bottom: 1rem;
-    padding: 0.6rem; /* Reduz o padding */
-    font-size: 0.9rem; /* Reduz o tamanho da fonte */
+    padding: 0.6rem;
+    font-size: 0.9rem;
     border: 1px solid #ccc;
     border-radius: 4px;
     transition: all 0.3s ease;
@@ -65,7 +65,7 @@ body {
   }
   
   /* Botão de login */
-  button {
+  /* button {
     background-color: #2b0548;
     color: white;
     border: none;
@@ -73,9 +73,9 @@ body {
     font-size: 1rem;
     border-radius: 4px;
     cursor: pointer;
-    width: 85%; /* Mantém o alinhamento com os inputs */
+    width: 85%;
     transition: background-color 0.3s ease;
-  }
+  } */
   
   button:hover {
     background-color: #1f0439;
@@ -112,9 +112,4 @@ body {
     position: absolute;
     bottom: 0;
     left: 0;
-  }
-  
-  
-  .testeBruno {
-    font-size: 5em;
   }

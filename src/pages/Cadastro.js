@@ -134,6 +134,10 @@ const Cadastro = () => {
         <button type="submit" disabled={loading}>
         {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
+        <p className={styles["login-link"]}>
+        Já possui conta?{" "}
+        <span onClick={() => navigate("/login")}>Login</span>
+      </p>
     </form>
     </div>
 
