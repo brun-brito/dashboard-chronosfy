@@ -4,6 +4,7 @@ import Agenda from "../components/Agenda";
 import AddHorarioButton from "../components/AddHorarioButton";
 import api from "../services/Api";
 import style from "../assets/Dashboard.module.css";
+import styles from "../assets/Agenda.module.css";
 
 const Dashboard = () => {
   const { user, logout } = useContext(AuthContext);
@@ -27,6 +28,7 @@ const Dashboard = () => {
   const [showResumo, setShowResumo] = useState(false);const [valorTotal, setValorTotal] = useState(0);
   const [horarioFinal, setHorarioFinal] = useState("");
   const [formErrors, setFormErrors] = useState({});
+  const [dadosProfissional, setDadosProfissional] = useState([]); // Serviços selecionados
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -38,36 +40,33 @@ const Dashboard = () => {
       [name]: value.trim() ? undefined : prevErrors[name],
     }));
   };
-  /*
 
-  */
-    const calcularResumo = () => {
-      const total = selectedServicos.reduce((acc, servicoNome) => {
-        const servico = servicosDisponiveis.find((s) => s.nome === servicoNome);
-        return acc + (servico ? servico.valor : 0);
-      }, 0);
-      setValorTotal(total);
+  const calcularResumo = () => {
+    const total = selectedServicos.reduce((acc, servicoNome) => {
+      const servico = servicosDisponiveis.find((s) => s.nome === servicoNome);
+      return acc + (servico ? servico.valor : 0);
+    }, 0);
+    setValorTotal(total);
 
-      // Total de minutos com base nos serviços selecionados
-      const minutosTotais = selectedServicos.reduce((acc, servicoNome) => {
-        const servico = servicosDisponiveis.find((s) => s.nome === servicoNome);
-        return acc + (servico?.tempo_estimado || 0);
-      }, 0);
-    
-      if (formData.start) {
-        const [hours, minutes] = formData.start.split(":").map(Number);
-        const inicio = new Date(1970, 0, 1, hours, minutes);
-        const final = new Date(inicio.getTime() + minutosTotais * 60000);
-    
-        const horasFinais = String(final.getHours()).padStart(2, "0");
-        const minutosFinais = String(final.getMinutes()).padStart(2, "0");
-        setHorarioFinal(`${horasFinais}:${minutosFinais}`);
-      } else {
-        setHorarioFinal("-");
-      }
-    };
-      
+    // Total de minutos com base nos serviços selecionados
+    const minutosTotais = selectedServicos.reduce((acc, servicoNome) => {
+      const servico = servicosDisponiveis.find((s) => s.nome === servicoNome);
+      return acc + (servico?.tempo_estimado || 0);
+    }, 0);
   
+    if (formData.start) {
+      const [hours, minutes] = formData.start.split(":").map(Number);
+      const inicio = new Date(1970, 0, 1, hours, minutes);
+      const final = new Date(inicio.getTime() + minutosTotais * 60000);
+  
+      const horasFinais = String(final.getHours()).padStart(2, "0");
+      const minutosFinais = String(final.getMinutes()).padStart(2, "0");
+      setHorarioFinal(`${horasFinais}:${minutosFinais}`);
+    } else {
+      setHorarioFinal("-");
+    }
+  };
+      
   const toggleResumoModal = () => {
     calcularResumo();
     setShowResumo(true);
@@ -108,6 +107,7 @@ const Dashboard = () => {
         setEvents(formattedEvents);
 
         const profissionalResponse = await api.get(`/v1/profissional/${user.uid}`);
+        setDadosProfissional(profissionalResponse.data);
         setHorarioFuncionamento(profissionalResponse.data.horario_funcionamento || {});
         setNome(profissionalResponse.data.nome);
 
@@ -167,14 +167,11 @@ const Dashboard = () => {
         servicos: selectedServicos,
         observacao: formData.observacao || "",
       };
-  
+      
+      //console.log(`Requisição completa: ${JSON.stringify(novoHorario, null, 2)}`);
       await api.post(`/v1/profissional/${user.uid}/agendamentos`, novoHorario);
   
-      // Caso de sucesso
       setFeedback({ type: "success", message: "Horário adicionado com sucesso!" });
-  
-      // Fechar os modais e limpar os estados
-      setShowResumo(false);
       setShowModal(false);
       setFormData({
         nome: "",
@@ -192,6 +189,7 @@ const Dashboard = () => {
       console.error(errorMessage);
       setFeedback({ type: "error", message: errorMessage });
     } finally {
+      setShowResumo(false);
       setLoading(false);
     }
   };
@@ -203,15 +201,15 @@ const Dashboard = () => {
 
       <AddHorarioButton onClick={() => setShowModal(true)} />
 
-      <Agenda events={events} horarioFuncionamento={horarioFuncionamento} />
+      <Agenda events={events} horarioFuncionamento={horarioFuncionamento} idUser={user.uid} dadosProfissional={dadosProfissional}/>
 
       {showModal && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
             <h3>Adicionar Horário</h3>
             <form onSubmit={handleAddHorario}>
 
-            <div style={styles.inputGroup}>
+            <div className={styles.inputGroup}>
                 <label>Nome do Cliente*:</label>
                 <input
                   type="text"
@@ -221,10 +219,10 @@ const Dashboard = () => {
                   onChange={handleInputChange}
                   required
                 />
-                {formErrors.nome && <p style={styles.errorMessage}>{formErrors.nome}</p>}
+                {formErrors.nome && <p className={styles.errorMessage}>{formErrors.nome}</p>}
               </div>
 
-              <div style={styles.inputGroup}>
+              <div className={styles.inputGroup}>
                 <label>Data*:</label>
                 <input
                   type="date"
@@ -233,10 +231,10 @@ const Dashboard = () => {
                   onChange={handleInputChange}
                   required
                 />
-                {formErrors.data && <p style={styles.errorMessage}>{formErrors.data}</p>}
+                {formErrors.data && <p className={styles.errorMessage}>{formErrors.data}</p>}
               </div>
 
-              <div style={styles.inputGroup}>
+              <div className={styles.inputGroup}>
                 <label>Horário de Início*:</label>
                 <input
                   type="time"
@@ -247,22 +245,22 @@ const Dashboard = () => {
                   onChange={handleInputChange}
                   required
                 />
-                {formErrors.horario && <p style={styles.errorMessage}>{formErrors.horario}</p>}
+                {formErrors.horario && <p className={styles.errorMessage}>{formErrors.horario}</p>}
               </div>
 
-              <div style={styles.inputGroup}>
+              <div className={styles.inputGroup}>
                 <label style={{ marginBottom: "10px", display: "block" }}>
                   Marque o(s) Procedimento(s) desejado(s)*:
                 </label>
-                <div style={styles.checkboxList}>
-                  {(mostrarTodos ? servicosDisponiveis : servicosDisponiveis.slice(0, 5)).map(
+                <div className={styles.checkboxList}>
+                  {(mostrarTodos ? servicosDisponiveis : servicosDisponiveis.slice(0, 4)).map(
                     (servico, index) => (
-                      <div key={servico.id || index} style={styles.checkboxItem}>
+                      <div key={servico.id || index} className={styles.checkboxItem}>
                         <input
                           type="checkbox"
                           id={`servico-${servico.id || index}`}
                           value={servico.nome}
-                          style={styles.checkbox}
+                          className={styles.checkbox}
                           onChange={(e) => {
                             handleServicoChange(e);
                             setFormErrors((prevErrors) => ({
@@ -277,19 +275,20 @@ const Dashboard = () => {
                         />
                         <label
                           htmlFor={`servico-${servico.id || index}`}
-                          style={styles.checkboxLabel}
+                          className={styles.checkboxLabel}
                         >
-                          {servico.nome}
+                          {servico.nome +` (R$${servico.valor} - ${servico.tempo_estimado} min)`}
                         </label>
                       </div>
                     )
                   )}
                 </div>
-                {formErrors.servicos && <p style={styles.errorMessage}>{formErrors.servicos}</p>}
+                {formErrors.servicos && <p className={styles.errorMessage}>{formErrors.servicos}</p>}
+                
                 {servicosDisponiveis.length > 5 && (
                   <button
                     type="button"
-                    style={styles.verMaisBtn}
+                    className={styles.verMaisBtn}
                     onClick={toggleMostrarTodos}
                   >
                     {mostrarTodos ? "▲ Ver menos" : "▼ Ver mais"}
@@ -297,15 +296,15 @@ const Dashboard = () => {
                 )}
               </div>
 
-              <div style={styles.inputGroup}>
+              <div style={{ marginTop: "10px" }}>
                 <label>Observação:</label>
                 <input type="text" name="observacao" placeholder="Campo não obrigatório"/>
               </div>
-              <div style={styles.actions}>
+              <div className={styles.actions}>
               <button
                 type="button"
+                className={styles.saveButton}
                 style={{
-                  ...styles.saveButton,
                   opacity: Object.keys(formErrors).length === 0 ? 1 : 0.5,
                   cursor: Object.keys(formErrors).length === 0 ? "pointer" : "not-allowed",
                 }}
@@ -319,7 +318,7 @@ const Dashboard = () => {
               </button>
                 <button
                   type="button"
-                  style={styles.cancelButton}
+                  className={styles.cancelButton}
                   onClick={() => {
                     setShowModal(false);
                     setFeedback(null);
@@ -336,8 +335,8 @@ const Dashboard = () => {
             </form>
             {feedback && (
               <div
+                className={styles.feedback}
                 style={{
-                  ...styles.feedback,
                   backgroundColor: feedback.type === "success" ? "#4CAF50" : "#f44336",
                 }}
               >
@@ -349,8 +348,8 @@ const Dashboard = () => {
       )}
 
       {showResumo && (
-        <div style={styles.modal}>
-          <div style={styles.modalContent}>
+        <div className={styles.modal}>
+          <div className={styles.modalContent}>
             <h3>Resumo do Agendamento</h3>
             <p><strong>Nome:</strong> {formData.nome || "-"}</p>
             <p>
@@ -362,17 +361,17 @@ const Dashboard = () => {
             <p><strong>Valor Total:</strong> R$ {valorTotal ? valorTotal.toFixed(2) : "0,00"}</p>
             <p><strong>Observação:</strong> {document.querySelector("input[name='observacao']")?.value || "-"}</p>
             
-            <div style={styles.actions}>
+            <div className={styles.actions}>
               <button
                 type="button"
-                style={styles.editButton}
+                className={styles.editButton}
                 onClick={() => setShowResumo(false)}
               >
                 Voltar
               </button>
               <button
                 type="button"
-                style={styles.saveButton}
+                className={styles.saveButton}
                 onClick={handleAddHorario}
               >
                 Confirmar
@@ -384,110 +383,6 @@ const Dashboard = () => {
 
     </div>
   );
-};
-
-const styles = {
-  modal: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    width: "100%",
-    height: "100%",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-    zIndex: 1000,
-  },
-  modalContent: {
-    backgroundColor: "white",
-    borderRadius: "8px",
-    padding: "20px",
-    width: "90%", 
-    maxWidth: "500px",
-    maxHeight: "90vh",
-    overflowY: "auto",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-  },
-  inputGroup: {
-    marginBottom: "10px",
-  },
-  checkboxList: {
-    display: "flex",
-    flexDirection: "column", // Alinha os itens em uma coluna
-    gap: "10px",
-  },
-  checkboxItem: {
-    display: "flex",
-    alignItems: "center", // Alinha o checkbox com o texto
-    gap: "10px", // Espaço entre o checkbox e o texto
-  },
-  checkbox: {
-    margin: 0,
-    width: "18px", // Tamanho do checkbox semelhante ao padrão
-    height: "18px",
-  },
-  checkboxLabel: {
-    fontSize: "16px", // Tamanho do texto
-    color: "#333", // Cor do texto
-  },
-  verMaisBtn: {
-    marginTop: "10px",
-    backgroundColor: "#2b0548",
-    color: "white",
-    border: "none",
-    padding: "8px 12px",
-    borderRadius: "5px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    fontSize: "14px",
-    transition: "background-color 0.3s ease",
-  },
-  verMaisBtnHover: {
-    backgroundColor: "#1f0439",
-  },actions: {
-    display: "flex",
-    justifyContent: "space-between",
-    gap: "10px",
-  },
-  saveButton: {
-    backgroundColor: "#4CAF50",
-    color: "white",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  cancelButton: {
-    backgroundColor: "#f44336",
-    color: "white",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-  },
-  feedback: {
-    marginTop: "15px",
-    padding: "10px",
-    borderRadius: "4px",
-    color: "white",
-    textAlign: "center",
-  },
-  editButton: {
-    backgroundColor: "#007BFF", // Azul
-    color: "white",
-    padding: "10px 15px",
-    border: "none",
-    borderRadius: "4px",
-    cursor: "pointer",
-    fontWeight: "bold",
-    marginRight: "10px",
-  },  
-  errorMessage: {
-    color: "#f44336",
-    fontSize: "12px",
-    marginTop: "5px",
-  },
 };
 
 export default Dashboard;
