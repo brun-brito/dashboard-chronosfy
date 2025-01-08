@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { modalStyles, modalContentStyles } from "../context/EstilosModais";
 import "moment/locale/pt-br";
 import api from "../services/Api";
 import styles from "../assets/Agenda.module.css";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaCheck } from "react-icons/fa";
 
 const localizer = momentLocalizer(moment);
 
@@ -160,7 +160,7 @@ const handleEventClick = (event) => {
   };
 
   return (
-    <div style={{ height: "500px" }}>
+    <div>
       <Calendar
         localizer={localizer}
         events={events}
@@ -194,8 +194,8 @@ const handleEventClick = (event) => {
       />
 
         {showModal && selectedEvent && (
-          <div style={modalStyles}>
-            <div style={modalContentStyles}>
+          <div className={styles.modalStyles}>
+            <div className={styles.modalContentStyles}>
               <h2>Detalhes do Evento</h2>
               {isEditing ? (
                 <>
@@ -208,137 +208,139 @@ const handleEventClick = (event) => {
                     />
                   </label>
 
-                  <label>Data*:</label>
-                    <input
-                      type="date"
-                      name="data"
-                      value={
-                        editedEvent?.horario?.inicio?._seconds
-                          ? moment(editedEvent.horario.inicio._seconds * 1000).format("YYYY-MM-DD") // Manter a data atual
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const newDate = e.target.value; // Nova data selecionada
-                        const currentTime =
+                  <div style={{ display: "flex", gap: "10px" }}>
+                    <div style={{ flex: 1 }}>
+                      <label>Data*:</label>
+                      <input
+                        type="date"
+                        name="data"
+                        value={
                           editedEvent?.horario?.inicio?._seconds
-                            ? moment(editedEvent.horario.inicio._seconds * 1000).format("HH:mm") // Preservar a hora existente
-                            : "00:00";
-
-                        if (newDate) {
-                          const newDateTime = new Date(`${newDate}T${currentTime}`);
-
-                          setEditedEvent((prev) => ({
-                            ...prev,
-                            horario: {
-                              ...prev.horario,
-                              inicio: {
-                                _seconds: Math.floor(newDateTime.getTime() / 1000),
-                                _nanoseconds: 0,
-                              },
-                            },
-                          }));
+                            ? moment(editedEvent.horario.inicio._seconds * 1000).format("YYYY-MM-DD")
+                            : ""
                         }
-                      }}
-                      required
-                    />
+                        onChange={(e) => {
+                          const newDate = e.target.value;
+                          const currentTime =
+                            editedEvent?.horario?.inicio?._seconds
+                              ? moment(editedEvent.horario.inicio._seconds * 1000).format("HH:mm")
+                              : "00:00";
 
-                    <label>Horário de Início*:</label>
-                    <input
-                      type="time"
-                      name="start"
-                      value={
-                        editedEvent?.horario?.inicio?._seconds
-                          ? moment(editedEvent.horario.inicio._seconds * 1000).format("HH:mm") // Manter o horário atual
-                          : ""
-                      }
-                      onChange={(e) => {
-                        const newTime = e.target.value; // Novo horário selecionado
-                        const currentDate =
+                          if (newDate) {
+                            const newDateTime = new Date(`${newDate}T${currentTime}`);
+
+                            setEditedEvent((prev) => ({
+                              ...prev,
+                              horario: {
+                                ...prev.horario,
+                                inicio: {
+                                  _seconds: Math.floor(newDateTime.getTime() / 1000),
+                                  _nanoseconds: 0,
+                                },
+                              },
+                            }));
+                          }
+                        }}
+                        required
+                      />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <label>Horário de Início*:</label>
+                      <input
+                        type="time"
+                        name="start"
+                        value={
                           editedEvent?.horario?.inicio?._seconds
-                            ? moment(editedEvent.horario.inicio._seconds * 1000).format("YYYY-MM-DD") // Preservar a data existente
-                            : moment().format("YYYY-MM-DD"); // Valor padrão se ausente
-
-                        if (newTime) {
-                          const newDateTime = new Date(`${currentDate}T${newTime}`);
-
-                          setEditedEvent((prev) => ({
-                            ...prev,
-                            horario: {
-                              ...prev.horario,
-                              inicio: {
-                                _seconds: Math.floor(newDateTime.getTime() / 1000),
-                                _nanoseconds: 0,
-                              },
-                            },
-                          }));
+                            ? moment(editedEvent.horario.inicio._seconds * 1000).format("HH:mm")
+                            : ""
                         }
-                      }}
-                      required
-                    />
+                        onChange={(e) => {
+                          const newTime = e.target.value;
+                          const currentDate =
+                            editedEvent?.horario?.inicio?._seconds
+                              ? moment(editedEvent.horario.inicio._seconds * 1000).format("YYYY-MM-DD")
+                              : moment().format("YYYY-MM-DD");
 
-                    <label>
-                      Serviço(s):
-                      <button onClick={openServicosModal}>
-                        Selecionar Serviços
-                      </button>
-                    </label>
-                    <p>Serviços Selecionados: {editedEvent.servicos.join(", ")}</p>
-                  </>
-                ) : (
-                  <>
-                    <p>
-                      <strong>Cliente:</strong> {selectedEvent.nome || "-"}
-                    </p>
-                    <p>
-                      <strong>Serviço(s):</strong> {selectedEvent.servicos?.join(", ") || "-"}
-                    </p>
-                    <p>
-                      <strong>Valor:</strong> R$ {selectedEvent.valor.toFixed(2) || "-"}
-                    </p>
-                    <p>
-                      <strong>Data:</strong> {moment(selectedEvent.horario.inicio._seconds * 1000).format("DD/MM/YYYY") || "-"}
-                    </p>
-                    <p>
-                      <strong>Início:</strong> {moment(selectedEvent.horario.inicio._seconds * 1000).format("HH:mm") || "-"}
-                    </p>
-                    <p>
-                      <strong>Fim:</strong> {moment(selectedEvent.horario.fim._seconds * 1000).format("HH:mm") || "-"}
-                    </p>
-                    <p>
-                      <strong>Obs.:</strong> {selectedEvent.observacao || "-"}
-                    </p>
-                  </>
-                )}<div style={{ marginTop: "10px" }}>
+                          if (newTime) {
+                            const newDateTime = new Date(`${currentDate}T${newTime}`);
+
+                            setEditedEvent((prev) => ({
+                              ...prev,
+                              horario: {
+                                ...prev.horario,
+                                inicio: {
+                                  _seconds: Math.floor(newDateTime.getTime() / 1000),
+                                  _nanoseconds: 0,
+                                },
+                              },
+                            }));
+                          }
+                        }}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <label>
+                    Serviço(s):
+                    <button onClick={openServicosModal} className={styles.buttonPrimary}>
+                      <FaCheck style={{ marginRight: "5px" }} /> Selecionar Serviços
+                    </button>
+                  </label>
+                  <p>Serviços Selecionados: {editedEvent.servicos.join(", ")}</p>
+                </>
+              ) : (
+                <>
+                  <p>
+                    <strong>Cliente:</strong> {selectedEvent.nome || "-"}
+                  </p>
+                  <p>
+                    <strong>Serviço(s):</strong> {selectedEvent.servicos?.join(", ") || "-"}
+                  </p>
+                  <p>
+                    <strong>Valor:</strong> R$ {selectedEvent.valor.toFixed(2) || "-"}
+                  </p>
+                  <p>
+                    <strong>Data:</strong> {moment(selectedEvent.horario.inicio._seconds * 1000).format("DD/MM/YYYY") || "-"}
+                  </p>
+                  <p>
+                    <strong>Início:</strong> {moment(selectedEvent.horario.inicio._seconds * 1000).format("HH:mm") || "-"}
+                  </p>
+                  <p>
+                    <strong>Fim:</strong> {moment(selectedEvent.horario.fim._seconds * 1000).format("HH:mm") || "-"}
+                  </p>
+                  <p>
+                    <strong>Obs.:</strong> {selectedEvent.observacao || "-"}
+                  </p>
+                </>
+              )}
+              <div style={{ marginTop: "10px", display: "flex", gap: "10px", justifyContent: "center" }}>
                 {isEditing ? (
-                    <button onClick={handleSave} style={{ marginRight: "10px" }}>
-                      Salvar
-                    </button>
-                  ) : (
-                    <button onClick={() => setIsEditing(true)} style={{ marginRight: "10px" }}>
-                      Editar
-                    </button>
-                  )}
-                <button onClick={closeModal}>Fechar</button>
-                {!isEditing && (
-                  <button
-                    onClick={handleDelete}
-                    style={{
-                      marginLeft: "10px",
-                      backgroundColor: "red",
-                      color: "white",
-                    }}
-                  >
-                    Excluir
+                  <button onClick={handleSave} className={styles.buttonPrimary}>
+                    <FaSave style={{ marginRight: "5px" }} /> Salvar
+                  </button>
+                ) : (
+                  <button onClick={() => setIsEditing(true)} className={styles.buttonSecondary}>
+                    <FaEdit style={{ marginRight: "5px" }} /> Editar
                   </button>
                 )}
-                </div>
+                <button onClick={closeModal}>
+                  <FaTimes style={{ marginRight: "5px" }} /> Fechar
+                </button>
+                {!isEditing && (
+                  <button onClick={handleDelete} className={styles.buttonDanger}>
+                    <FaTrash style={{ marginRight: "5px" }} /> Excluir
+                  </button>
+                )}
               </div>
             </div>
-          )}
+          </div>
+        )}
+
 
         {showServicosModal && (
-          <div style={modalStyles}>
-            <div style={modalContentStyles}>
+          <div className={styles.modalStyles}>
+            <div className={styles.modalContentStyles}>
               <h2>Selecionar Serviços</h2>
               <div className={styles.checkboxList}>
                 {(mostrarTodos ? dadosProfissional.servicos : dadosProfissional.servicos.slice(0, 4)).map(

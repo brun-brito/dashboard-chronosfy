@@ -65,7 +65,7 @@ body {
   }
   
   /* Botão de login */
-  /* button {
+  .button-login {
     background-color: #2b0548;
     color: white;
     border: none;
@@ -75,9 +75,9 @@ body {
     cursor: pointer;
     width: 85%;
     transition: background-color 0.3s ease;
-  } */
+  } 
   
-  button:hover {
+  .button-login:hover {
     background-color: #1f0439;
   }
   

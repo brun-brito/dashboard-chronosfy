@@ -39,13 +39,14 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Entrar</button>
+        <button className={styles["button-login"]} type="submit">Entrar</button>
       </form>
       <p className={styles["register-link"]}>
         Ainda não possui conta?{" "}
         <span onClick={() => navigate("/cadastro")}>Cadastrar</span>
       </p>
     </div>
+    <p style={{ justifyContent: "center", display: "flex" }}>COLOCAR LOGO AQUI!!! <img src="teste"></img></p>
   </div>
   );
 };

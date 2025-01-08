@@ -1,0 +1,31 @@
+.perfilContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f7f8fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .perfilInfo {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+  
+  .perfilInfo p {
+    margin: 8px 0;
+  }
+  
+  .servicosList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .servicosList li {
+    margin: 8px 0;
+    background-color: #e7e7e7;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  

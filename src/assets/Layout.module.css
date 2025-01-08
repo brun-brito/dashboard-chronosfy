@@ -1,24 +1,33 @@
-/* Layout.css */
-
+/* Layout principal */
 .layout-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh; /* Garante que o layout ocupe toda a altura da janela */
-  }
-  
-  .content-container {
-    flex: 1; /* Faz com que o conteúdo ocupe o espaço restante */
-    padding: 20px;
-    box-sizing: border-box; /* Inclui padding no tamanho total do elemento */
-  }
-  
-  .footer {
-    text-align: center;
-    padding: 1rem 0;
-    background-color: #2b0548;
-    color: white;
-    font-size: 0.9rem;
-    flex-shrink: 0; /* Impede o footer de encolher */
-    position: relative;
-    z-index: 1;
-  }
+  display: flex;
+  height: 100vh;
+  background-color: #f7f8fa; /* Fundo claro */
+}
+
+.main-layout {
+  flex: 1; /* Preenche todo o espaço disponível */
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* Evita scroll desnecessário */
+}
+
+.content-container {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto; /* Rolagem no conteúdo principal */
+  box-sizing: border-box;
+}
+
+.footer {
+  position: fixed; 
+  bottom: 0;
+  left: 0;
+  width: 100%; /* Garantir que ocupe toda a largura */
+  text-align: center;
+  padding: 1rem 0;
+  background-color: #494e51; /* Cinza escuro */
+  color: white;
+  font-size: 0.9rem;
+  z-index: 1000; /* Sobrepor a sidebar */
+}

@@ -66,6 +66,7 @@ const Cadastro = () => {
         <input
         type="text"
         name="nome"
+        placeholder="ex: Consultório Odontológico Mais Dentista"
         value={formData.nome}
         onChange={handleChange}
         required
@@ -80,8 +81,7 @@ const Cadastro = () => {
             value="cnpj"
             checked={formData.documentoTipo === "cnpj"}
             onChange={handleChange}
-            />
-            CNPJ
+            />CNPJ
         </label>
         <label>
             <input
@@ -90,13 +90,13 @@ const Cadastro = () => {
             value="cpf"
             checked={formData.documentoTipo === "cpf"}
             onChange={handleChange}
-            />
-            CPF
+            />CPF
         </label>
         </div>
         <input
         type="text"
         name="documento"
+        placeholder={formData.documentoTipo === "cnpj" ? "ex: 21679220000163" : "ex: 82719056006"}
         value={formData.documento}
         onChange={handleChange}
         required
@@ -106,6 +106,7 @@ const Cadastro = () => {
         <input
         type="text"
         name="telefone"
+        placeholder="ex: 21985442497"
         value={formData.telefone}
         onChange={handleChange}
         required
@@ -115,6 +116,7 @@ const Cadastro = () => {
         <input
         type="email"
         name="email"
+        placeholder="ex: consultorio@chronosfy.com"
         value={formData.email}
         onChange={handleChange}
         required
@@ -124,6 +126,7 @@ const Cadastro = () => {
         <input
         type="password"
         name="senha"
+        placeholder="******"
         value={formData.senha}
         onChange={handleChange}
         required
@@ -131,7 +134,7 @@ const Cadastro = () => {
 
         {errorMessage && <div className={styles["error-message"]}>{errorMessage}</div>}
 
-        <button type="submit" disabled={loading}>
+        <button className={styles.buttonCadastro} type="submit" disabled={loading}>
         {loading ? "Cadastrando..." : "Cadastrar"}
         </button>
         <p className={styles["login-link"]}>

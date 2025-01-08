@@ -1,18 +1,16 @@
 import React, { useContext, useEffect, useState } from "react";
 import { AuthContext } from "../context/AuthContext";
+import { DashboardContext } from "../context/DashboardContext";
 import Agenda from "../components/Agenda";
-import AddHorarioButton from "../components/AddHorarioButton";
 import api from "../services/Api";
 import style from "../assets/Dashboard.module.css";
 import styles from "../assets/Agenda.module.css";
 
 const Dashboard = () => {
-  const { user, logout } = useContext(AuthContext);
-  const [events, setEvents] = useState([]);
-  const [horarioFuncionamento, setHorarioFuncionamento] = useState({});
-  const [nome, setNome] = useState(""); // Nome do profissional
+  const { user } = useContext(AuthContext);
+  const { dadosDashboard, setDadosDashboard } = useContext(DashboardContext);
+  const { events, horarioFuncionamento, nome, servicosDisponiveis, dadosProfissional } = dadosDashboard;
   const [showModal, setShowModal] = useState(false); // Controle do modal
-  const [servicosDisponiveis, setServicosDisponiveis] = useState([]); // Serviços disponíveis
   const [selectedServicos, setSelectedServicos] = useState([]); // Serviços selecionados
     const [formData, setFormData] = useState({
     nome: "",
@@ -20,15 +18,14 @@ const Dashboard = () => {
     start: "",
     observacao: "",
   });
-  // const [start, setStart] = useState("");
   const [loading, setLoading] = useState(false); // Controle do loading
+  const [ setError] = useState(null);
   const [feedback, setFeedback] = useState(null); // Feedback de sucesso ou falha
   const [mostrarTodos, setMostrarTodos] = useState(false);
   const toggleMostrarTodos = () => setMostrarTodos(!mostrarTodos);
   const [showResumo, setShowResumo] = useState(false);const [valorTotal, setValorTotal] = useState(0);
   const [horarioFinal, setHorarioFinal] = useState("");
   const [formErrors, setFormErrors] = useState({});
-  const [dadosProfissional, setDadosProfissional] = useState([]); // Serviços selecionados
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -95,8 +92,11 @@ const Dashboard = () => {
   // Buscar dados do profissional e agendamentos
   useEffect(() => {
     const fetchData = async () => {
+      if (dadosDashboard?.events?.length) return; // Verifique se o contexto já tem dados
+  
       setLoading(true);
       try {
+        // Fetch data da API
         const agendamentosResponse = await api.get(`/v1/profissional/${user.uid}/agendamentos`);
         const formattedEvents = agendamentosResponse.data.map((event) => {
           const start = new Date(event.horario.inicio._seconds * 1000);
@@ -104,30 +104,25 @@ const Dashboard = () => {
           const title = `${event.nome} - ${event.servicos.join(", ")}`;
           return { ...event, title, start, end };
         });
-        setEvents(formattedEvents);
-
+  
         const profissionalResponse = await api.get(`/v1/profissional/${user.uid}`);
-        setDadosProfissional(profissionalResponse.data);
-        setHorarioFuncionamento(profissionalResponse.data.horario_funcionamento || {});
-        setNome(profissionalResponse.data.nome);
-
-        // Serviços disponíveis
-        const servicosFormatados = (profissionalResponse.data.servicos || []).map((servico) => ({
-          id: servico.id || Math.random().toString(36).substring(2, 9),
-          nome: servico.nome,
-          valor: servico.valor || 0,
-          tempo_estimado: servico.tempo_estimado || 0,
-        }));
-        setServicosDisponiveis(servicosFormatados);
+        setDadosDashboard({
+          events: formattedEvents,
+          horarioFuncionamento: profissionalResponse.data.horario_funcionamento || {},
+          nome: profissionalResponse.data.nome,
+          servicosDisponiveis: profissionalResponse.data.servicos || [],
+          dadosProfissional: profissionalResponse.data,
+        });
       } catch (error) {
-        console.error("Erro ao carregar dados:", error);
+        console.error("Erro ao carregar dados do dashboard:", error);
+        setError("Erro ao carregar os dados do dashboard.");
       } finally {
-        setLoading(false); // Desativar o loading após as requisições
+        setLoading(false);
       }
     };
-
+  
     fetchData();
-  }, [user]);
+  }, [dadosDashboard, setDadosDashboard, setError, user.uid]); 
 
   if (loading) {
     return (
@@ -197,11 +192,21 @@ const Dashboard = () => {
   return (
     <div>
       <h1>Bem-vindo, {nome || "Profissional"}</h1>
-      <button onClick={logout} className={style.logout}>Sair</button>
 
-      <AddHorarioButton onClick={() => setShowModal(true)} />
+      <button
+        onClick={() => setShowModal(true)}
+        className={styles.addButton}
+      >
+        <span>+</span>
+        Adicionar Horário
+      </button>
 
-      <Agenda events={events} horarioFuncionamento={horarioFuncionamento} idUser={user.uid} dadosProfissional={dadosProfissional}/>
+      <Agenda 
+        events={events}
+        horarioFuncionamento={horarioFuncionamento} 
+        idUser={user.uid} 
+        dadosProfissional={dadosProfissional}
+      />
 
       {showModal && (
         <div className={styles.modal}>
