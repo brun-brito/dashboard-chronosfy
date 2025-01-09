@@ -17,21 +17,25 @@ const SideBar = () => {
   };
 
   return (
-    <div
-      style={isOpen ? { alignItems: "flex-end" } : { alignItems: "center" }}
-      className={`${styles.sidebar} ${isOpen ? styles.open : styles.collapsed}`}
-    >
-      {/* Botão para expandir/recolher */}
+    <div>
+      {/* Botão flutuante sempre visível */}
       <div
-        className={styles.toggleButton}
+        className={`${styles.toggleButton} ${!isOpen ? styles.toggleButtonClose : styles.toggleButtonOpen} ${
+          isOpen ? styles.openButton : styles.closedButton
+        }`}
         onClick={toggleSidebar}
-        style={{ right: isOpen ? "-20px" : "-10px" }}
       >
-        {(!isOpen && <icon.FaChevronRight />) || (isOpen && <icon.FaChevronLeft />)}
+        {isOpen ? <icon.FaChevronLeft /> : <icon.FaChevronRight />}
       </div>
 
-      <nav>
-        <ul className={styles.navList}>
+      {/* Sidebar visível apenas se `isOpen` for true */}
+      <div
+        className={`${styles.sidebar} ${
+          isOpen ? styles.openSidebar : styles.hiddenSidebar
+        }`}
+      >
+        <nav>
+        <ul className={`${styles.navList} ${isOpen ? styles.navListVisible : styles.navListHidden}`}>
           <li className={styles.navItem} onClick={handleItemClick}>
             <Link to="/dashboard">
               <icon.FaCalendarAlt className={styles.icon} />
@@ -51,6 +55,12 @@ const SideBar = () => {
             </Link>
           </li>
           <li className={styles.navItem} onClick={handleItemClick}>
+            <Link to="/servicos">
+              <icon.FaTools className={styles.icon} />
+              {isOpen && <span>Serviços</span>}
+            </Link>
+          </li>
+          <li className={styles.navItem} onClick={handleItemClick}>
             <Link to="/clientes">
               <icon.FaUsers className={styles.icon} />
               {isOpen && <span>Clientes</span>}
@@ -63,22 +73,22 @@ const SideBar = () => {
             </Link>
           </li>
         </ul>
-        {/* Linha separadora */}
-        <hr className={styles.separator} />
-        {/* Botão de logout */}
-        <ul className={styles.logoutSection}>
-          <li
-            className={styles.navItem}
-            onClick={() => {
-              handleItemClick();
-              logout(); // Também faz logout
-            }}
-          >
-            <icon.FaSignOutAlt className={styles.icon} style={{ color: "red" }} />
-            {isOpen && <span>Sair</span>}
-          </li>
-        </ul>
-      </nav>
+          <hr className={styles.separator} />
+          <ul className={`${styles.logoutSection} ${isOpen ? styles.navListVisible : styles.navListHidden}`}>
+          {/* <ul className={styles.logoutSection}> */}
+            <li
+              className={styles.navItem}
+              onClick={() => {
+                handleItemClick();
+                logout();
+              }}
+            >
+              <icon.FaSignOutAlt className={styles.icon} style={{ color: "red" }} />
+              {isOpen && <span>Sair</span>}
+            </li>
+          </ul>
+        </nav>
+      </div>
     </div>
   );
 };

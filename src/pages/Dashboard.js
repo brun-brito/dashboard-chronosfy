@@ -3,7 +3,7 @@ import { AuthContext } from "../context/AuthContext";
 import { DashboardContext } from "../context/DashboardContext";
 import Agenda from "../components/Agenda";
 import api from "../services/Api";
-import style from "../assets/Dashboard.module.css";
+import style from "../assets/Loading.module.css";
 import styles from "../assets/Agenda.module.css";
 
 const Dashboard = () => {
@@ -296,7 +296,7 @@ const Dashboard = () => {
                     className={styles.verMaisBtn}
                     onClick={toggleMostrarTodos}
                   >
-                    {mostrarTodos ? "▲ Ver menos" : "▼ Ver mais"}
+                    {mostrarTodos ? "▲ Ver menos" : "▼ Ver tudo"}
                   </button>
                 )}
               </div>

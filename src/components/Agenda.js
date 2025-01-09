@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -15,11 +15,24 @@ const Agenda = ({ events, horarioFuncionamento, idUser, dadosProfissional }) => 
   const [showServicosModal, setShowServicosModal] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [editedEvent, setEditedEvent] = useState(null);
-  const [view, setView] = useState(null);
+  const getDefaultView = () => (window.innerWidth <= 768 ? "day" : "month");
+  const [view, setView] = useState(getDefaultView());
   const [currentDate, setCurrentDate] = useState(new Date());
   const [mostrarTodos, setMostrarTodos] = useState(false);
-  const [loading, setLoading] = useState(false); // Para mostrar o loading
-  const [message, setMessage] = useState(""); // Para mensagens de erro ou sucesso
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  useEffect(() => {
+    const updateDefaultView = () => {
+      setView(getDefaultView());
+    };
+
+    window.addEventListener("resize", updateDefaultView);
+
+    return () => {
+      window.removeEventListener("resize", updateDefaultView);
+    };
+  }, []);
 
   const removeAcentos = (str) => {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -170,11 +183,10 @@ const handleEventClick = (event) => {
         min={min} // Ajusta o horário mínimo dinamicamente
         max={max} // Ajusta o horário máximo dinamicamente
         onSelectEvent={handleEventClick}
-        onNavigate={(date) => setCurrentDate(date)} // Atualiza a data ao navegar
+        onNavigate={(date) => setCurrentDate(date)}
         eventPropGetter={eventStyleGetter}
-        onView={(newView) => {
-          setView(newView);
-        }}
+        onView={(newView) => setView(newView)}
+        defaultView={view}
         dayPropGetter={dayPropGetter}
         messages={{
           date: "Data",
@@ -369,7 +381,7 @@ const handleEventClick = (event) => {
                   className={styles.verMaisBtn}
                   onClick={() => setMostrarTodos((prev) => !prev)}
                 >
-                  {mostrarTodos ? "▲ Ver menos" : "▼ Ver mais"}
+                  {mostrarTodos ? "▲ Ver menos" : "▼ Ver tudo"}
                 </button>
               )}
               <button onClick={closeServicosModal} style={{ marginTop: "10px" }}>

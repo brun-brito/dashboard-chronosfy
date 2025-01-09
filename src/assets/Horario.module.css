@@ -39,48 +39,83 @@
   
   .actions {
     margin-top: 20px;
-    display: flex;
-    gap: 10px;
+    display: grid;
+    justify-content: space-around;
+    align-items: center;
+    /* gap: 20px; */
   }
   
   .saveButton {
     background-color: #28a745;
     color: white;
-    padding: 10px 15px;
+    padding: 12px 18px;
     border: none;
-    border-radius: 4px;
+    border-radius: 8px;
     cursor: pointer;
     font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
   
   .saveButton.disabled {
     background-color: #ccc;
+    color: #999;
     cursor: not-allowed;
-  }
-  
-  .suspendButton {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
   }
   
   .saveButton:hover:not(.disabled) {
     background-color: #218838;
+    transform: scale(1.05);
+  }
+  
+  .suspendButton,
+  .reactivateButton {
+    color: white;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .suspendButton {
+    background-color: #dc3545;
   }
   
   .suspendButton:hover {
     background-color: #c82333;
+    transform: scale(1.05);
+  }
+  
+  .reactivateButton {
+    background-color: #285ba7dd;
+  }
+  
+  .reactivateButton:hover {
+    background-color: #285ba7;
+    transform: scale(1.05);
+  }
+  
+  .infoMessage {
+    font-size: 12px;
+    color: #555;
+    text-align: center;
+    margin-top: -5px;
+    line-height: 1.4;
   }
   
   .feedback {
     color: green;
     margin-bottom: 10px;
+    font-weight: bold;
   }
-
+  
   .errorContainer {
     text-align: center;
     margin-top: 20px;
@@ -100,6 +135,7 @@
     border-radius: 4px;
     cursor: pointer;
     font-size: 14px;
+    transition: background-color 0.3s ease;
   }
   
   .reloadButton:hover {
@@ -107,40 +143,26 @@
   }
   
   .buttonContainer {
-    margin-top: 20px;
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 10px;
+    margin-top: 10px;
   }
   
-  .suspendButton,
-  .reactivateButton {
-    background-color: #dc3545;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 14px;
+  .infoMessage span {
+    font-size: 16px;
+    font-weight: bold;
+    color: #666;
+    margin-right: 5px;
   }
-  
-  .reactivateButton {
-    background-color: #28a745; /* Verde para reativar */
+
+  .iconButton {
+    margin-right: 8px;
   }
-  
-  .suspendButton:hover {
-    background-color: #c82333;
+
+  @media (max-width: 768px) {
+    .iconButton {
+        width: 40px;
+    }
   }
-  
-  .reactivateButton:hover {
-    background-color: #218838;
-  }
-  
-  .infoMessage {
-    font-size: 12px;
-    color: #555;
-    text-align: center;
-    margin-top: -5px;
-  }
-  

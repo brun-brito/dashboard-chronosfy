@@ -5,7 +5,7 @@ import styles from "../assets/Layout.module.css";
 
 const Layout = () => {
   const anoAtual = new Date().getFullYear();
-  const routesWithSidebar = ["/dashboard", "/perfil", "/horario", "/clientes"];
+  const routesWithSidebar = ["/dashboard", "/perfil", "/horario", "/servicos","/clientes", "/relatorios"];
   const routesWithFooter = ["/login", "/cadastro"];
   const location = useLocation();
 

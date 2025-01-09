@@ -1,0 +1,471 @@
+/* Servicos.module.css */
+
+.servicosContainer {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.servicosGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .servicoCard {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 15px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  .servicoCard input {
+    width: auto;
+}
+  
+  .servicoCard:hover {
+    transform: scale(1.02);
+  }
+  
+  .servicosHeader {
+    display: flex;
+    /* justify-content: space-between; */
+    align-items: center;
+    padding: 10px 20px;
+    gap: 15px;
+  }
+
+.servicosHeader h1 {
+  font-size: 24px;
+  color: #333;
+  margin: 0;
+}
+
+.addServiceButton {
+  padding: 10px 20px;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.addServiceButton.addButton {
+    background-color: #28a745;
+  color: #fff;
+}
+
+.addServiceButton.addButton:hover {
+    background-color: #218838;
+}
+
+.addServiceButton.cancelButton {
+  background-color: #dc3545;
+  color: #fff;
+}
+
+.addServiceButton.cancelButton:hover {
+  background-color: #c82333;
+}
+
+.newService {
+  padding: 20px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.serviceField {
+  display: flex;
+  flex-direction: column;
+}
+
+.serviceField label {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 5px;
+}
+
+.serviceField input {
+  padding: 8px 10px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  outline: none;
+  width: auto;
+}
+
+.serviceField input:focus {
+  border-color: #007bff;
+}
+
+.servicosList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.servicoCard {
+  padding: 15px;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.servicoCard p {
+  margin: 5px 0;
+  font-size: 14px;
+  color: #333;
+}
+
+.cardActions {
+    display: flex;
+    /* justify-content: flex-end; */
+    gap: 10px;
+    margin-top: 15px;
+  }
+
+.removeButton,.editButton {
+  padding: 8px 12px;
+  font-size: 14px;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.removeButton{
+  background-color: #dc3545;
+}
+
+.removeButton:hover {
+  background-color: #c82333;
+}
+
+.toggleButton {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #6e7e8fc2;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.toggleButton:hover {
+  background-color: #6e7e8f;
+}
+
+.actions {
+  margin-top: 20px;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+.editButton {
+    background-color: #007bff;
+  }
+  
+  .editButton:hover {
+    background-color: #0056b3;
+  }
+
+.saveButton {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #28a745;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.saveButton:hover {
+  background-color: #218838;
+}
+
+.cancelButton {
+  padding: 10px 15px;
+  font-size: 16px;
+  background-color: #6c757d;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.cancelButton:hover {
+  background-color: #5a6268;
+}
+
+.icon {
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+    .servicoCard {
+        max-width: fit-content;
+    }
+}
+
+/*
+.perfilContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f7f8fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .perfilInfo {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+  }
+  
+  .perfilInfo p {
+    margin: 8px 0;
+  }
+  
+  .servicosList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .servicosList li {
+    /* margin: 8px 0; 
+    background-color: #e7e7e7;
+    padding: 10px;
+    border-radius: 4px;
+  }
+  
+  .perfilContainer {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  
+  .perfilInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .formGroup {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .formGroup label {
+    font-weight: bold;
+    font-size: 14px;
+    /* margin-bottom: 5px; 
+  }
+  
+  .formGroup p,
+  .formGroup input {
+    font-size: 16px;
+    padding: 8px 10px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    width: 100%;
+  }
+  
+  .formGroup input {
+    background-color: #fff;
+  }
+  
+  .servicosList {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 16px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .servicoCard {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 16px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .servicoCard p {
+    margin: 4px 0;
+    color: #333;
+  }  
+  
+  .servicoItem {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    background-color: #ffffff;
+  }
+  
+  .serviceEdit,
+  .serviceView {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .serviceField {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  
+  .serviceField label {
+    font-weight: bold;
+    color: #555;
+  }
+  
+  .serviceField input {
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+  }
+  
+  .actions {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+  }
+  
+  .saveButton,
+  .cancelButton,
+  .editButton,
+  .addButton,
+  .removeButton {
+    background-color: #dc3545;
+    color: white;
+    padding: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    transition: background-color 0.2s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .saveButton {
+    background-color: #28a745;
+    color: #fff;
+  }
+  
+  .saveButton:hover {
+    background-color: #218838;
+  }
+  
+  .cancelButton {
+    background-color: #dc3545;
+    color: #fff;
+  }
+  
+  .cancelButton:hover {
+    background-color: #c82333;
+  }
+  
+  .editButton {
+    background-color: #007bff;
+    color: #fff;
+  }
+  
+  .editButton:hover {
+    background-color: #0056b3;
+  }
+  
+  .addButton {
+    background-color: #28a745;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: background-color 0.2s ease-in-out;
+  }
+  
+  .addButton:hover {
+    background-color: #218838;
+  }
+
+  .removeButton {
+    background-color: #ff0707;
+    color: #fff;
+  }
+  
+  .removeButton:hover {
+    background-color: #c82333;
+  }
+  
+  .icon {
+    font-size: 14px;
+  }
+  
+  .toggleButton {
+    background: none;
+    color: #007bff;
+    border: none;
+    font-size: 14px;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+
+  .toggleButton:hover {
+    text-decoration: underline;
+  }
+
+*/

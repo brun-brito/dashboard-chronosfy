@@ -6,9 +6,11 @@ import Cadastro from "./pages/Cadastro";
 import Dashboard from "./pages/Dashboard";
 import Perfil from "./pages/Perfil";
 import Horario from "./pages/Horario";
+import Servicos from "./pages/Servicos";
 import Clientes from "./pages/Clientes";
-import ProtectedRoute from "./routes/ProtectedRoute";
 import Layout from "./pages/Layout";
+import Relatorios from "./pages/Relatorios";
+import ProtectedRoute from "./routes/ProtectedRoute";
 import { PerfilProvider } from "./context/PerfilContext";
 import { DashboardProvider } from "./context/DashboardContext";
 
@@ -60,10 +62,26 @@ const App = () => {
                   }
                 />
                 <Route
+                  path="servicos"
+                  element={
+                    <ProtectedRoute>
+                      <Servicos />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
                   path="clientes"
                   element={
                     <ProtectedRoute>
                       <Clientes />
+                    </ProtectedRoute>
+                  }
+                />
+                <Route
+                  path="relatorios"
+                  element={
+                    <ProtectedRoute>
+                      <Relatorios />
                     </ProtectedRoute>
                   }
                 />
