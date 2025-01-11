@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "moment/locale/pt-br";
 import api from "../services/Api";
 import styles from "../assets/Agenda.module.css";
-import { FaEdit, FaTrash, FaSave, FaTimes, FaCheck } from "react-icons/fa";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaCheck, FaCalendarAlt } from "react-icons/fa";
 
 const localizer = momentLocalizer(moment);
 
@@ -21,18 +21,10 @@ const Agenda = ({ events, horarioFuncionamento, idUser, dadosProfissional }) => 
   const [mostrarTodos, setMostrarTodos] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
-
-  useEffect(() => {
-    const updateDefaultView = () => {
-      setView(getDefaultView());
-    };
-
-    window.addEventListener("resize", updateDefaultView);
-
-    return () => {
-      window.removeEventListener("resize", updateDefaultView);
-    };
-  }, []);
+  // const [calendarHeight, setCalendarHeight] = useState(
+  //   window.innerWidth <= 768 ? "100vh" : "550px"
+  // );
+  const [fontSize] = useState(window.innerWidth <= 768 ? "0.8em" : "1em");
 
   const removeAcentos = (str) => {
     return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
@@ -53,21 +45,25 @@ const Agenda = ({ events, horarioFuncionamento, idUser, dadosProfissional }) => 
   const dayPropGetter = (date) => {
     const day = removeAcentos(moment(date).format("ddd").toLowerCase());
     const horarioHoje = horarioFuncionamento[day] || null;
-    const isPast = moment(date).isBefore(moment(), "day");
+    // const isPast = moment(date).isBefore(moment(), "day");
 
-    if (!horarioHoje || isPast) {
+    if (!horarioHoje) {
       return {
         style: {
           backgroundColor: "#d3d3d3",
           color: "#721c24",
+          border: "1px solid #e0e0e0",
+          padding: "5px",
+          minHeight: "80px",
         },
       };
     }
 
     return {
       style: {
-        backgroundColor: "#ffffff", // Branco para dias disponíveis
-        color: "#000000", // Texto padrão
+        border: "1px solid #e0e0e0",
+        padding: "5px",
+        minHeight: "80px",
       },
     };
   };
@@ -79,6 +75,59 @@ const handleEventClick = (event) => {
     setIsEditing(false); // Sempre começar em modo de visualização
   };
 
+  const capitalize = (str) => str.charAt(0).toUpperCase() + str.slice(1);
+
+  const getFormattedTitle = () => {
+    if (view === "month") {
+      return moment(currentDate).format("MMMM YYYY");
+    } 
+    
+    else if (view === "week") {
+      const startOfWeek = moment(currentDate).startOf("week").format("DD/MM");
+      const endOfWeek = moment(currentDate).endOf("week").format("DD/MM");
+      return `${startOfWeek} - ${endOfWeek}`;
+    } 
+    
+    else if (view === "day") {
+      return capitalize(moment(currentDate).format("dddd, DD [de] MMM"));
+    } 
+    
+    else if (view === "agenda") {
+      const startDate = moment(currentDate).format("DD/MM/YYYY");
+      const endDate = moment(currentDate).add(1, "month").subtract(1, "day").format("DD/MM/YYYY");
+      return `${startDate} – ${endDate}`;
+    } 
+    
+    else {
+      return "Agenda";
+    }
+  };
+
+  const handleNavigation = (direction) => {
+    const unit =
+      view === "month"
+        ? "months"
+        : view === "week"
+        ? "weeks"
+        : view === "agenda"
+        ? "days"
+        : "days";
+  
+    const increment = view === "agenda" ? 30 : 1;
+  
+    const newDate =
+      direction === "prev"
+        ? moment(currentDate).subtract(increment, unit).toDate()
+        : moment(currentDate).add(increment, unit).toDate();
+  
+    setCurrentDate(newDate);
+  };
+  
+
+  const goToToday = () => {
+    setCurrentDate(new Date());
+  };
+  
   const closeModal = () => {
     setShowModal(false);
     setSelectedEvent(null);
@@ -129,10 +178,10 @@ const handleEventClick = (event) => {
       setMessage("Alterações salvas com sucesso!");
       window.location.reload()
     } catch (error) {
-      console.error("Erro ao salvar as alterações:", error);
-      setMessage("Erro ao salvar as alterações. Tente novamente.");
+      console.error("Erro ao salvar as alterações:", error.response.data.error);
+      setMessage(`Erro ao salvar as alterações: ${error.response.data.error}`);
     } finally {
-      setLoading(false); // Finalizar o loading
+      setLoading(false);
     }
   };  
 
@@ -159,35 +208,70 @@ const handleEventClick = (event) => {
 
   const eventStyleGetter = (event) => {
     const now = new Date();
-    const isPast = event.end < now;
+    // const isPast = event.end < now;
 
     return {
       style: {
-        backgroundColor: isPast ? "#f8d7da" : "#3174ad",
-        color: isPast ? "#721c24" : "#fff",
-        border: isPast ? "1px solid #f5c6cb" : "1px solid #ddd",
-        borderRadius: "4px",
-        marginLeft: view === "week" ? "5px" : "0px",
+        backgroundColor: event.end < now ? "#f8d7da" : "#3174ad",
+        color: event.end < now ? "#721c24" : "#fff",
+        borderRadius: "8px",
+        padding: "5px",
+        margin: "5px 0",
       },
     };
   };
 
   return (
     <div>
+      {/* Toolbar personalizada */}
+      <div className={styles.customToolbar}>
+      <div className={styles.navButtons}>
+        <button aria-label="teste" onClick={() => handleNavigation("prev")} className={styles.iconButton}>
+          ◄
+        </button>
+        <button onClick={goToToday} className={styles.iconButton}>
+          <FaCalendarAlt style={{fontSize: "1.4em", color: "#4a148c"}}/>
+        </button>
+        <button onClick={() => handleNavigation("next")} className={styles.iconButton}>
+          ►
+        </button>
+      </div>
+
+      <div className={styles.viewSelector}>
+        <select
+          value={view}
+          onChange={(e) => setView(e.target.value)}
+          className={styles.viewSelect}
+        >
+          <option value="month">Mês</option>
+          <option value="week">Semana</option>
+          <option value="day">Dia</option>
+          <option value="agenda">Agenda</option>
+        </select>
+      </div>
+
+      <div className={styles.titleContainer}>
+        <h3 className={styles.title}>{getFormattedTitle()}</h3>
+      </div>
+
+    </div>
+
       <Calendar
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
-        style={{ height: 500 }}
-        min={min} // Ajusta o horário mínimo dinamicamente
-        max={max} // Ajusta o horário máximo dinamicamente
+        view={view}
+        date={currentDate}
+        style={{ height: "80vh", fontSize: fontSize, padding: "10px" }}
+        onView={(newView) => setView(newView)}
+        min={min}
+        max={max}
         onSelectEvent={handleEventClick}
         onNavigate={(date) => setCurrentDate(date)}
         eventPropGetter={eventStyleGetter}
-        onView={(newView) => setView(newView)}
-        defaultView={view}
         dayPropGetter={dayPropGetter}
+        toolbar={false}
         messages={{
           date: "Data",
           time: "Hora",
@@ -220,7 +304,7 @@ const handleEventClick = (event) => {
                     />
                   </label>
 
-                  <div style={{ display: "flex", gap: "10px" }}>
+                  <div style={{ display: "flex", gap: "10px", alignItems: "center" }}>
                     <div style={{ flex: 1 }}>
                       <label>Data*:</label>
                       <input
@@ -295,7 +379,7 @@ const handleEventClick = (event) => {
 
                   <label>
                     Serviço(s):
-                    <button onClick={openServicosModal} className={styles.buttonPrimary}>
+                    <button onClick={openServicosModal} className={styles.buttonSelect}>
                       <FaCheck style={{ marginRight: "5px" }} /> Selecionar Serviços
                     </button>
                   </label>
@@ -375,18 +459,20 @@ const handleEventClick = (event) => {
                   )
                 )}
               </div>
-              {dadosProfissional.servicos.length > 4 && (
-                <button
-                  type="button"
-                  className={styles.verMaisBtn}
-                  onClick={() => setMostrarTodos((prev) => !prev)}
-                >
-                  {mostrarTodos ? "▲ Ver menos" : "▼ Ver tudo"}
+              <div style={{ gap: "10px", display: "flex" }}>
+                {dadosProfissional.servicos.length > 4 && (
+                  <button
+                    type="button"
+                    className={styles.verMaisBtn}
+                    onClick={() => setMostrarTodos((prev) => !prev)}
+                  >
+                    {mostrarTodos ? "▲ Ver menos" : "▼ Ver tudo"}
+                  </button>
+                )}
+                <button onClick={closeServicosModal} style={{ marginTop: "10px" }}>
+                  <FaTimes style={{ marginRight: "5px" }} /> Fechar
                 </button>
-              )}
-              <button onClick={closeServicosModal} style={{ marginTop: "10px" }}>
-                Fechar
-              </button>
+              </div>
             </div>
           </div>
         )}
@@ -394,7 +480,6 @@ const handleEventClick = (event) => {
         {loading && (
           <div className={styles.loadingOverlay}>
             <div className={styles.spinner}></div>
-            {/* <p>Processando...</p> */}
           </div>
         )}
 

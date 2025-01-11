@@ -5,6 +5,7 @@ import Agenda from "../components/Agenda";
 import api from "../services/Api";
 import style from "../assets/Loading.module.css";
 import styles from "../assets/Agenda.module.css";
+import { FaPlus } from "react-icons/fa";
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -80,13 +81,23 @@ const Dashboard = () => {
   
   const validateForm = () => {
     const errors = {};
-    if (!formData.nome.trim()) errors.nome = "O campo Nome é obrigatório.";
-    if (!formData.data.trim()) errors.data = "O campo Data é obrigatório.";
-    if (!formData.start.trim()) errors.horario = "O campo Horário de Início é obrigatório.";
-    if (selectedServicos.length === 0) errors.servicos = "Selecione pelo menos um procedimento.";
   
-    setFormErrors(errors);
-    return Object.keys(errors).length === 0; // Retorna true se não houver erros
+    if (!formData.nome.trim()) {
+      errors.nome = "O campo Nome é obrigatório.";
+    }
+    if (!formData.data.trim()) {
+      errors.data = "O campo Data é obrigatório.";
+    }
+    if (!formData.start.trim()) {
+      errors.horario = "O campo Horário de Início é obrigatório.";
+    }
+    if (selectedServicos.length === 0) {
+      errors.servicos = "Selecione pelo menos um procedimento.";
+    }
+  
+    setFormErrors(errors); // Atualiza os erros no estado
+  
+    return Object.keys(errors).length === 0; // Retorna true apenas se não houver erros
   };
   
   // Buscar dados do profissional e agendamentos
@@ -181,7 +192,7 @@ const Dashboard = () => {
       window.location.reload();
     } catch (error) {
       const errorMessage = error.response?.data?.error || "Erro ao adicionar horário.";
-      console.error(errorMessage);
+      // console.error(errorMessage);
       setFeedback({ type: "error", message: errorMessage });
     } finally {
       setShowResumo(false);
@@ -191,14 +202,14 @@ const Dashboard = () => {
   
   return (
     <div>
-      <h1>Bem-vindo, {nome || "Profissional"}</h1>
+      <h1>Agenda de {nome || "Profissional"}</h1>
 
       <button
         onClick={() => setShowModal(true)}
         className={styles.addButton}
+        aria-label="Adicionar Horário"
       >
-        <span>+</span>
-        Adicionar Horário
+        <FaPlus />
       </button>
 
       <Agenda 
@@ -265,6 +276,7 @@ const Dashboard = () => {
                           type="checkbox"
                           id={`servico-${servico.id || index}`}
                           value={servico.nome}
+                          checked={selectedServicos.includes(servico.nome)} 
                           className={styles.checkbox}
                           onChange={(e) => {
                             handleServicoChange(e);
@@ -310,11 +322,24 @@ const Dashboard = () => {
                 type="button"
                 className={styles.saveButton}
                 style={{
-                  opacity: Object.keys(formErrors).length === 0 ? 1 : 0.5,
-                  cursor: Object.keys(formErrors).length === 0 ? "pointer" : "not-allowed",
+                  opacity:
+                    formData.nome.trim() &&
+                    formData.data.trim() &&
+                    formData.start.trim() &&
+                    selectedServicos.length > 0
+                      ? 1
+                      : 0.5,
+                  cursor:
+                    formData.nome.trim() &&
+                    formData.data.trim() &&
+                    formData.start.trim() &&
+                    selectedServicos.length > 0
+                      ? "pointer"
+                      : "not-allowed",
                 }}
                 onClick={() => {
-                  if (validateForm()) {
+                  const isValid = validateForm();
+                  if (isValid) {
                     toggleResumoModal();
                   }
                 }}

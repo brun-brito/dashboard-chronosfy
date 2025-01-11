@@ -4,6 +4,7 @@ import styles from "../assets/Servicos.module.css";
 import { AuthContext } from "../context/AuthContext";
 import { PerfilContext } from "../context/PerfilContext";
 import { FaEdit, FaTrash, FaSave, FaTimes, FaPlus } from "react-icons/fa";
+import style from "../assets/Loading.module.css";
 
 const Servicos = () => {
   const { user } = useContext(AuthContext);
@@ -120,7 +121,12 @@ const Servicos = () => {
   };
 
   if (loading) {
-    return <p>Carregando...</p>;
+    return (
+      <div className={style["loading-container"]}>
+        <div className={style["loading-spinner"]}></div>
+        <p>Carregando...</p>
+      </div>
+    );
   }
 
   if (error) {

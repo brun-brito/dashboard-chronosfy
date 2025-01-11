@@ -22,10 +22,6 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   }
   
-  .inputGroup {
-    /* Deixado vazio caso precise de estilos futuros */
-  }
-  
   .checkboxList {
     display: flex;
     flex-direction: column;
@@ -176,10 +172,9 @@
   }
   
   /* Botões primários */
-.buttonPrimary {
+.buttonPrimary,.buttonSelect {
   display: inline-flex;
   align-items: center;
-  background-color: #4caf50;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -187,7 +182,19 @@
   border-radius: 5px;
   cursor: pointer;
   transition: background-color 0.3s ease;
-  }
+}
+
+.buttonSelect:hover {
+  background-color: #007bb5;
+}
+
+.buttonSelect {
+  background-color: #007cb5e1;
+}
+
+.buttonPrimary {
+  background-color: #4caf50;
+}
   
 .buttonPrimary:hover {
   background-color: #45a049;
@@ -307,21 +314,270 @@
   box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
 }
 
-.addButton {
-  background-color: #28a745;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 10px 15px;
-  font-size: 16px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 10px;
+.modalContentStyles input{
+  width: auto;
 }
 
-.addButton span {
-  font-size: 20px;
+.addButton {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  background-color: #28a746c5;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 24px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  z-index: 1000;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.addButton:hover {
+  background-color: #28a745; /* Cor ao passar o mouse */
+  transform: scale(1.1); /* Efeito de aumento ao passar o mouse */
+}
+
+.addButton:focus {
+  outline: none; /* Remove a borda de foco padrão */
+  box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.5); /* Adiciona uma borda de foco */
+}
+
+/* Container principal do calendário */
+:global(.rbc-calendar) {
+  max-width: 95%; /* Aumenta a largura para ocupar mais espaço */
+  margin: 0 auto; /* Centraliza o calendário */
+}
+
+/* Largura das colunas e espaçamento */
+:global(.rbc-month-view) {
+  width: 100%;
+}
+
+:global(.rbc-day-bg) {
+  width: calc(100% / 7); /* Garante que cada célula tenha o mesmo tamanho */
+}
+
+/* Cards de eventos */
+:global(.rbc-event) {
+  border-radius: 5px;
+  padding: 5px 10px; /* Espaçamento interno maior */
+  font-size: 0.9em;
+  overflow-wrap: break-word; /* Quebra linhas longas */
+}
+
+:global(.rbc-event:hover) {
+  background-color: #1565c0;
+}
+
+/* Estilo das células */
+:global(.rbc-day-bg) {
+  padding: 5px; /* Espaçamento interno */
+}
+
+/* Dias fora do mês atual */
+:global(.rbc-off-range-bg) {
+  background-color: #f4f4f4;
+  color: #aaa;
+}
+
+/* Circula o dia atual de azul */
+:global(.rbc-date-cell.rbc-now button) {
+  background-color: #4a148c;
+  border-radius: 10px;
+  width: 23px;
+  height: 23px;
+  color: #fff;
   font-weight: bold;
 }
+
+/* Toolbar: Botões e Navegação */
+:global(.rbc-toolbar) {
+  background-color: #4a148c;
+  color: white;
+  padding: 10px 5px;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap; /* Permite ajuste em telas menores */
+}
+
+:global(.rbc-toolbar button) {
+  background-color: #6a1b9a;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 3px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+:global(.rbc-toolbar button:hover) {
+  background-color: #8e24aa;
+}
+
+:global(.rbc-time-content > * + * > * ) {
+  border: none;
+}
+
+:global(.rbc-today .rbc-date-cell) {
+  position: relative;
+}
+
+/*  SE QUISER ALTERAR O BACKGROUND DO CARD DO DIA
+ :global(.rbc-today) {
+   background-color: #4a148c34; 
+} */ 
+
+:global(.rbc-today .rbc-date-cell::after) {
+  content: attr(data-day);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 23px;
+  height: 23px;
+  background-color: #007bff;
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  :global(.rbc-calendar) {
+    max-width: 100%; /* Garante que ocupe toda a largura no mobile */
+  }
+
+  :global(.rbc-event) {
+    font-size: 0.8em;
+    padding: 3px 5px; /* Reduz padding em dispositivos menores */
+  }
+
+  :global(.rbc-toolbar) {
+    flex-direction: column; /* Organiza os botões verticalmente */
+    gap: 10px;
+  }
+
+  :global(.rbc-toolbar button) {
+    font-size: 0.8rem;
+    padding: 5px 8px;
+  }
+  
+  :global(.rbc-month-view) {
+    width: 120%;
+    left: -38px;
+  }
+
+  :global(.rbc-time-header) {
+    max-height: 35px;
+  }
+
+  :global(.rbc-time-view) {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1;
+    width: 120%;
+    border: 1px solid #ddd;
+    min-height: 0;
+    left: -30px;
+    position: relative;
+  }
+}
+
+.customToolbar {
+  display: flex;
+  flex-wrap: wrap; /* Permite que os itens se organizem em várias linhas, se necessário */
+  justify-content: space-between; /* Distribui os itens uniformemente */
+  align-items: center; /* Centraliza verticalmente */
+  padding: 10px 20px;
+  background-color: #f9f9f9;
+  gap: 10px; /* Espaçamento entre os itens */
+}
+
+.navButtons {
+  display: flex;
+  gap: 10px; /* Espaçamento entre os botões */
+  flex-shrink: 0; /* Mantém o tamanho mínimo dos botões */
+}
+
+.iconButton {
+  background: none;
+  border: none;
+  font-size: 1.2em;
+  color: #007bff;
+  cursor: pointer;
+}
+
+.iconButton:hover {
+  color: #0056b3;
+}
+
+.title {
+  font-size: 1.1em;
+  color: #333;
+  text-align: center;
+  margin: 0;
+  flex-grow: 1;
+  text-transform: uppercase;
+}
+
+.titleContainer {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1; /* Faz com que o container ocupe o espaço necessário */
+  text-align: center;
+  background-color: #dad2d25c;
+}
+
+.viewSelector {
+  display: flex;
+  justify-content: flex-end;
+  flex-shrink: 0; /* Evita que o seletor encolha muito */
+}
+
+.viewSelect {
+  padding: 5px;
+  font-size: 0.9em;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  color: #333;
+}
+
+@media (max-width: 768px) {
+  .customToolbar {
+    flex-direction: column; /* Empilha os itens em telas pequenas */
+    align-items: center;
+    gap: 5px; /* Reduz o espaçamento */
+  }
+
+  .navButtons {
+    justify-content: center; /* Centraliza os botões de navegação */
+    gap: 5px;
+  }
+
+  .viewSelector {
+    width: 100%;
+    justify-content: center; /* Centraliza o seletor */
+  }
+
+  .title {
+    font-size: 0.9em; /* Reduz o tamanho da fonte do título */
+  }
+
+  .viewSelect {
+    width: 100%;
+    text-align: center;
+  }
+}
+
