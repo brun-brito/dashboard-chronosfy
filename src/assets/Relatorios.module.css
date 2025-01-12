@@ -1,0 +1,88 @@
+.relatoriosContainer {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .filtroPeriodo {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  
+  .filtroPeriodo label {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .botaoGerar {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .botaoGerar:hover {
+    background-color: #0056b3;
+  }
+  
+  .relatoriosDetalhes {
+    margin-top: 20px;
+  }
+  
+  .clientesList {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .clienteCard {
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  .clienteCard h3 {
+    margin: 0;
+  }
+  
+  .loading {
+    text-align: center;
+    font-size: 18px;
+  }
+  
+  .error {
+    color: red;
+    text-align: center;
+    font-size: 18px;
+  }
+  
+  .clientesTable {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .clientesTable th,
+  .clientesTable td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  .clientesTable th {
+    cursor: pointer;
+    background-color: #f4f4f4;
+  }
+  
+  .clientesTable th:hover {
+    background-color: #ddd;
+  }
+  
+  .clientesTable tbody tr:hover {
+    background-color: #f9f9f9;
+  }
+  

@@ -123,7 +123,6 @@ const handleEventClick = (event) => {
     setCurrentDate(newDate);
   };
   
-
   const goToToday = () => {
     setCurrentDate(new Date());
   };
@@ -160,6 +159,7 @@ const handleEventClick = (event) => {
       const adjustedDate = new Date(inicioDate.getTime() - 3 * 60 * 60 * 1000); // Subtrair 3 horas (UTC-3)
   
       const formattedEvent = {
+        id: editedEvent?.id,
         nome: editedEvent?.nome,
         servicos: editedEvent?.servicos,
         observacao: editedEvent?.observacao || "-",
@@ -421,7 +421,7 @@ const handleEventClick = (event) => {
                   </button>
                 )}
                 <button onClick={closeModal}>
-                  <FaTimes style={{ marginRight: "5px" }} /> Fechar
+                  <FaTimes style={{ marginRight: "5px" }} /> Cancelar
                 </button>
                 {!isEditing && (
                   <button onClick={handleDelete} className={styles.buttonDanger}>
@@ -470,7 +470,7 @@ const handleEventClick = (event) => {
                   </button>
                 )}
                 <button onClick={closeServicosModal} style={{ marginTop: "10px" }}>
-                  <FaTimes style={{ marginRight: "5px" }} /> Fechar
+                  <FaCheck style={{ marginRight: "5px" }} /> Ok
                 </button>
               </div>
             </div>

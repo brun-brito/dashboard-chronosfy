@@ -1,103 +1,97 @@
 import React, { useEffect, useState, useContext } from "react";
-import { AuthContext } from "../context/AuthContext";
 import api from "../services/Api";
 import styles from "../assets/Clientes.module.css";
+import { AuthContext } from "../context/AuthContext";
+import { FaEdit, FaTrash, FaSave, FaTimes, FaPlus } from "react-icons/fa";
 import style from "../assets/Loading.module.css";
 
-const Clientes = ({ idProfissional }) => {
-  const [clientes, setClientes] = useState([]);
-  const [selectedCliente, setSelectedCliente] = useState(null);
+const Clientes = () => {
   const { user } = useContext(AuthContext);
-  const [formData, setFormData] = useState({
-    nome: "",
-    cpf: "",
-    email: "",
-    telefone: "",
-  });
-  const [isEditing, setIsEditing] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [feedback, setFeedback] = useState("");
-  idProfissional = user.uid;
+  const [clientes, setClientes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [newCliente, setNewCliente] = useState({ nome: "", cpf: "", email: "", telefone: "" });
+  const [showAddClienteForm, setShowAddClienteForm] = useState(false);
+  const [editIndex, setEditIndex] = useState(null);
+  const [mostrarTodos, setMostrarTodos] = useState(false);
+  const [clientesToShow] = useState(window.innerWidth <= 768 ? 4 : 8);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Carrega os clientes apenas uma vez
   useEffect(() => {
     const fetchClientes = async () => {
       try {
-        const response = await api.get(`/v1/profissional/${idProfissional}/clientes`);
+        const response = await api.get(`/v1/profissional/${user.uid}/clientes`);
         setClientes(response.data);
-      } catch (error) {
-        console.error("Erro ao buscar clientes:", error);
-        setFeedback("Erro ao carregar clientes. Tente novamente.");
+        setError(null);
+      } catch (err) {
+        setError(`Erro ao carregar os clientes: ${err.response.data.error || "Erro desconhecido"}`);
+      } finally {
+        setLoading(false);
       }
     };
     fetchClientes();
-  }, [idProfissional]);
+  }, [user.uid]);
 
-  // Lida com as mudanças nos campos de formulário
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  // Adiciona um novo cliente
   const handleAddCliente = async () => {
-    setLoading(true);
-    setFeedback("");
-    try {
-      const teste = await api.post(`/v1/profissional/${idProfissional}/clientes`, formData);
-      console.log(teste);
-      setClientes((prev) => [...prev, formData]); // Adiciona o novo cliente na lista
-      setFormData({ nome: "", cpf: "", email: "", telefone: "" }); // Limpa o formulário
-      setFeedback("Cliente adicionado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao adicionar cliente:", error);
-      setFeedback(`Erro ao adicionar cliente: ${error.response.data.error}`);
-    } finally {
-      setLoading(false);
+    if (newCliente.nome.trim() && newCliente.cpf.trim() && newCliente.email.trim()) {
+
+      setNewCliente({ nome: "", cpf: "", email: "", telefone: "" });
+      setShowAddClienteForm(false);
+
+      try {
+        const response = await api.post(`/v1/profissional/${user.uid}/clientes`, newCliente);
+        const novoCliente = { ...newCliente, id: response.data.id };
+        setClientes((prev) => [...prev, novoCliente]);
+        setError(null);
+      } catch (err) {
+        setError(`Erro ao adicionar o cliente: ${err.response.data.error || "Erro desconhecido"}`);
+      }
     }
   };
 
-  // Edita os dados de um cliente
-  const handleEditCliente = async () => {
-    setLoading(true);
-    setFeedback("");
+  const handleEditCliente = (index) => {
+    setEditIndex(index);
+  };
+
+  const handleSaveEditCliente = async (e, index) => {
+    e.preventDefault();
     try {
-      await api.put(
-        `/v1/profissional/${idProfissional}/clientes/${selectedCliente.id}`,
-        formData
-      );
-      setClientes((prev) =>
-        prev.map((cliente) =>
-          cliente.id === selectedCliente.id ? { ...cliente, ...formData } : cliente
-        )
-      );
-      setSelectedCliente(null);
-      setIsEditing(false);
-      setFeedback("Cliente editado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao editar cliente:", error);
-      setFeedback("Erro ao editar cliente. Tente novamente.");
-    } finally {
-      setLoading(false);
+      await api.put(`/v1/profissional/${user.uid}/clientes/${clientes[index].id}`, clientes[index]);
+      setEditIndex(null);
+    } catch (err) {
+      setError(`Erro ao editar cliente: ${err.response.data.error || "Erro desconhecido"}`);
     }
   };
 
-  // Exclui um cliente
-  const handleDeleteCliente = async (id) => {
-    setLoading(true);
-    setFeedback("");
-    try {
-      await api.delete(`/v1/profissional/${idProfissional}/clientes/${id}`);
-      setClientes((prev) => prev.filter((cliente) => cliente.id !== id));
-      setFeedback("Cliente excluído com sucesso!");
-    } catch (error) {
-      console.error("Erro ao excluir cliente:", error);
-      setFeedback("Erro ao excluir cliente. Tente novamente.");
-    } finally {
-      setLoading(false);
+  const handleRemoveCliente = async (index) => {
+    if (window.confirm("Tem certeza de que deseja excluir este cliente?")) {
+      const updatedClientes = [...clientes];
+      const clienteId = updatedClientes[index].id;
+      updatedClientes.splice(index, 1);
+      setClientes(updatedClientes);
+
+      try {
+        await api.delete(`/v1/profissional/${user.uid}/clientes/${clienteId}`);
+      } catch (err) {
+        console.error("Erro ao remover cliente:", err.response.data.error);
+      }
     }
+  };
+
+  const handleClienteChange = (index, field, value) => {
+    const updatedClientes = [...clientes];
+    updatedClientes[index][field] = value;
+    setClientes(updatedClientes);
   };
   
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  const filteredClientes = clientes.filter((cliente) =>
+    cliente.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );  
+
   if (loading) {
     return (
       <div className={style["loading-container"]}>
@@ -107,121 +101,225 @@ const Clientes = ({ idProfissional }) => {
     );
   }
 
+  if (error) {
+    return (
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        <p style={{ color: "red", marginBottom: "20px" }}>{error}</p>
+        <button
+          onClick={() => window.location.reload()}
+          style={{
+            padding: "10px 20px",
+            fontSize: "16px",
+            backgroundColor: "#4a148c",
+            color: "white",
+            border: "none",
+            borderRadius: "5px",
+            cursor: "pointer",
+          }}
+        >
+          Voltar
+        </button>
+      </div>
+    );
+  }
+  
+
   return (
-    <div className={styles.container}>
+    <div className={styles.clientesContainer}>
       <h1>Clientes</h1>
-      <div className={styles.addCliente}>
-        <h3>Adicionar Cliente</h3>
-        <form className="formulario">
+      <div className={styles.searchBar}>
+          <label htmlFor="search">Buscar Cliente:</label>
           <input
             type="text"
-            name="nome"
-            placeholder="Nome"
-            value={formData.nome}
-            onChange={handleInputChange}
-            required
+            id="search"
+            placeholder="Digite o nome do cliente"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className={styles.searchInput}
           />
-          <input
-            type="text"
-            name="cpf"
-            placeholder="CPF"
-            value={formData.cpf}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="email"
-            name="email"
-            placeholder="Email"
-            value={formData.email}
-            onChange={handleInputChange}
-            required
-          />
-          <input
-            type="tel"
-            name="telefone"
-            placeholder="Telefone"
-            value={formData.telefone}
-            onChange={handleInputChange}
-            required
-          />
-          <button className="buttonCliente" type="button" onClick={handleAddCliente} disabled={loading}>
-            {loading ? "Adicionando..." : "Adicionar"}
-          </button>
-        </form>
-      </div>
+        </div>
 
-      <div className={styles.clientesList}>
-        <h3>Lista de Clientes</h3>
-        {clientes.length === 0 ? (
-          <p className={styles.noClientes}>Nenhum cliente encontrado. Adicione um novo cliente acima.</p>
-        ) : (
-          clientes.map((cliente, index) => (
-            <div key={cliente.id || index} className={styles.clienteCard}>
-              <p><strong>Nome:</strong> {cliente.nome}</p>
-              <p><strong>CPF:</strong> {cliente.cpf}</p>
-              <p><strong>Email:</strong> {cliente.email}</p>
-              <p><strong>Telefone:</strong> {cliente.telefone}</p>
-              <button onClick={() => setSelectedCliente(cliente)}>Ver Detalhes</button>
-              <button onClick={() => handleDeleteCliente(cliente.id)}>Excluir</button>
-            </div>
-          ))
-        )}
-      </div>
-
-      {selectedCliente && (
-        <div className={styles.modal}>
-          <div className={styles.modalContent}>
-            <h3>{isEditing ? "Editar Cliente" : "Detalhes do Cliente"}</h3>
-            {isEditing ? (
-              <form>
+      <div className={styles.clientesGrid}>
+          {(clientes.length === 0 || filteredClientes.length === 0)? (
+        <p>
+          Nenhum cliente encontrado. Adicione clicando no botão abaixo.
+        </p>
+      ) : (
+        (mostrarTodos ? filteredClientes : filteredClientes.slice(0, clientesToShow)).map((cliente, index) => (
+          <div key={cliente.id || index} className={styles.clienteCard}>
+            {editIndex === index ? (
+              <>
+              <form onSubmit={(e) => handleSaveEditCliente(e, index)}>
+                <label>Nome:</label>
                 <input
                   type="text"
-                  name="nome"
-                  placeholder="Nome"
-                  value={formData.nome}
-                  onChange={handleInputChange}
+                  value={cliente.nome}
+                  onChange={(e) => handleClienteChange(index, "nome", e.target.value)}
+                  required
                 />
+                <label>CPF:</label>
                 <input
                   type="text"
-                  name="cpf"
-                  placeholder="CPF"
-                  value={formData.cpf}
-                  onChange={handleInputChange}
+                  value={cliente.cpf}
+                  onChange={(e) =>
+                    handleClienteChange(
+                      index,
+                      "cpf",
+                      e.target.value.replace(/\D/g, "").slice(0, 11) // Permite apenas números, limita a 11
+                    )
+                  }
+                  placeholder="Digite o CPF"
+                  maxLength="11"
+                  minLength="11"                  required
                 />
+                <label>E-mail:</label>
                 <input
                   type="email"
-                  name="email"
-                  placeholder="Email"
-                  value={formData.email}
-                  onChange={handleInputChange}
+                  value={cliente.email}
+                  onChange={(e) => handleClienteChange(index, "email", e.target.value)}
+                  required
                 />
+                <label>Telefone:</label>
                 <input
-                  type="tel"
-                  name="telefone"
-                  placeholder="Telefone"
-                  value={formData.telefone}
-                  onChange={handleInputChange}
+                  type="text"
+                  value={cliente.telefone}
+                  onChange={(e) =>
+                    handleClienteChange(
+                      index,
+                      "telefone",
+                      e.target.value.replace(/\D/g, "").slice(0, 11) // Permite apenas números, limita a 11
+                    )
+                  }
+                  placeholder="Digite o número de telefone"
+                  maxLength="11"
+                  minLength="11"                  required
                 />
-                <button className="buttonCliente" type="button" onClick={handleEditCliente} disabled={loading}>
-                  {loading ? "Salvando..." : "Salvar"}
-                </button>
-              </form>
+                <div className={styles.cardActions}>
+                  <button className={styles.saveButton} type="submit">
+                    <FaSave />
+                  </button>
+                  <button className={styles.cancelButton} onClick={() => setEditIndex(null)}>
+                    <FaTimes />
+                  </button>
+                </div>
+              </form>        
+              </>
             ) : (
               <>
-                <p><strong>Nome:</strong> {selectedCliente.nome}</p>
-                <p><strong>CPF:</strong> {selectedCliente.cpf}</p>
-                <p><strong>Email:</strong> {selectedCliente.email}</p>
-                <p><strong>Telefone:</strong> {selectedCliente.telefone}</p>
-                <button className="buttonCliente" onClick={() => setIsEditing(true)}>Editar</button>
+                <p><strong>Nome:</strong> {cliente.nome}</p>
+                <p><strong>CPF:</strong> {cliente.cpf}</p>
+                <p><strong>E-mail:</strong> {cliente.email}</p>
+                <p><strong>Telefone:</strong> {cliente.telefone}</p>
+                <div className={styles.cardActions}>
+                  <button className={styles.editButton} onClick={() => handleEditCliente(index)}>
+                    <FaEdit />
+                  </button>
+                  <button className={styles.removeButton} onClick={() => handleRemoveCliente(index)}>
+                    <FaTrash />
+                  </button>
+                </div>
               </>
             )}
-            <button className="buttonCliente" onClick={() => setSelectedCliente(null)}>Fechar</button>
           </div>
-        </div>
+        ))
       )}
+      </div>
 
-      {feedback && <p className={styles.feedback}>{feedback}</p>}
+      <div className={styles.clientesHeader}>
+        {clientes.length > clientesToShow && (
+          <button className={styles.toggleButton} onClick={() => setMostrarTodos(!mostrarTodos)}>
+            {mostrarTodos ? "▲ Ver menos" : "▼ Ver tudo"}
+          </button>
+        )}
+
+        <button
+          onClick={() => setShowAddClienteForm(!showAddClienteForm)}
+          className={`${styles.addClienteButton} ${showAddClienteForm ? styles.cancelButton : styles.addButton}`}
+        >
+          {showAddClienteForm ? (
+            <>
+              <FaTimes className={styles.icon} /> Cancelar
+            </>
+          ) : (
+            <>
+              <FaPlus className={styles.icon} /> Adicionar Cliente
+            </>
+          )}
+        </button>
+      </div>
+
+      {showAddClienteForm && (
+        <form
+          onSubmit={(e) => {
+            e.preventDefault(); // Previne o comportamento padrão do formulário
+            handleAddCliente();
+          }}
+          className={styles.newCliente}
+        >        
+          <h3>Adicionar Cliente</h3>
+          <div className={styles.clienteField}>
+            <label>Nome:</label>
+            <input
+              type="text"
+              placeholder="Nome do cliente"
+              value={newCliente.nome}
+              onChange={(e) =>
+                setNewCliente((prev) => ({ ...prev, nome: e.target.value }))
+              }
+              required
+            />
+          </div>
+          <div className={styles.clienteField}>
+            <label>CPF:</label>
+            <input
+              type="text"
+              placeholder="CPF"
+              value={newCliente.cpf}
+              onChange={(e) =>
+                setNewCliente((prev) => ({
+                  ...prev,
+                  cpf: e.target.value.replace(/\D/g, "").slice(0, 11), // Apenas números e máximo de 11 caracteres
+                }))
+              }
+              maxLength="11"
+              minLength="11"
+              required
+            />
+          </div>
+          <div className={styles.clienteField}>
+            <label>E-mail:</label>
+            <input
+              type="email"
+              placeholder="E-mail"
+              value={newCliente.email}
+              onChange={(e) =>
+                setNewCliente((prev) => ({ ...prev, email: e.target.value }))
+              }
+              required
+            />
+          </div>
+          <div className={styles.clienteField}>
+            <label>Telefone:</label>
+            <input
+              type="text"
+              placeholder="Telefone"
+              value={newCliente.telefone}
+              onChange={(e) =>
+                setNewCliente((prev) => ({
+                  ...prev,
+                  telefone: e.target.value.replace(/\D/g, "").slice(0, 11), // Apenas números e máximo de 11 caracteres
+                }))
+              }
+              maxLength="11"
+              minLength="11"
+              required
+            />
+          </div>
+          <button type="submit" className={styles.saveButton}>
+            <FaSave className={styles.icon} /> Salvar Cliente
+          </button>
+        </form>
+      )}
     </div>
   );
 };

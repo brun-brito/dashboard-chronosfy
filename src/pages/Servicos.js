@@ -17,6 +17,7 @@ const Servicos = () => {
   const [editIndex, setEditIndex] = useState(null);
   const [mostrarTodos, setMostrarTodos] = useState(false);
   const [servicesToShow, setServicesToShow] = useState(4); 
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const updateServicesToShow = () => {
@@ -58,6 +59,14 @@ const Servicos = () => {
 
     fetchServicos();
   }, [dadosUsuario?.servicos, setDadosUsuario, user.uid]);
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+  
+  const filteredServices = editForm.filter((servico) =>
+    servico.nome.toLowerCase().includes(searchTerm.toLowerCase())
+  );  
 
   const handleAddService = async () => {
     if (newService.nome.trim() && newService.valor.trim()) {
@@ -136,8 +145,23 @@ const Servicos = () => {
   return (
     <div className={styles.servicosContainer}>
         <h1>Serviços Oferecidos</h1>
+        <div className={styles.searchBar}>
+          <label htmlFor="search">Buscar Serviço:</label>
+          <input
+            type="text"
+            id="search"
+            placeholder="Digite o nome do serviço"
+            value={searchTerm}
+            onChange={handleSearchChange}
+            className={styles.searchInput}
+          />
+        </div>
+
         <div className={styles.servicosGrid}>
-        {(mostrarTodos ? editForm : editForm.slice(0, servicesToShow)).map((servico, index) => (
+          {(dadosUsuario.servicos.length === 0 || filteredServices.length === 0)? (
+            <p>Nenhum serviço encontrado. Adicione clicando no botão abaixo.</p>
+          ) : (
+        (mostrarTodos ? filteredServices : filteredServices.slice(0, servicesToShow)).map((servico, index) => (
           <div key={index} className={styles.servicoCard}>
             {editIndex === index ? (
               <>
@@ -205,7 +229,8 @@ const Servicos = () => {
               </>
             )}
           </div>
-        ))}
+        ))
+      )}
       </div>
 
       <div className={styles.servicosHeader}>

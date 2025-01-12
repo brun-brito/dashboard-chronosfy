@@ -6,6 +6,8 @@ import api from "../services/Api";
 import style from "../assets/Loading.module.css";
 import styles from "../assets/Agenda.module.css";
 import { FaPlus } from "react-icons/fa";
+import { Link } from "react-router-dom";
+import { isAnyOf } from "@reduxjs/toolkit";
 
 const Dashboard = () => {
   const { user } = useContext(AuthContext);
@@ -27,6 +29,29 @@ const Dashboard = () => {
   const [showResumo, setShowResumo] = useState(false);const [valorTotal, setValorTotal] = useState(0);
   const [horarioFinal, setHorarioFinal] = useState("");
   const [formErrors, setFormErrors] = useState({});
+  const [clientes, setClientes] = useState([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [searchResults, setSearchResults] = useState([]);
+  const [showResults, setShowResults] = useState(false);
+
+  useEffect(() => {
+    const fetchClientes = async () => {
+      try {
+        const response = await api.get(`/v1/profissional/${user.uid}/clientes`);
+        setClientes(response.data || []); 
+      } catch (error) {
+        console.error("Erro ao buscar clientes:", error);
+      }
+    };
+
+    fetchClientes();
+  }, [user.uid]);
+
+  
+  const removeAcentos = (str) => {
+    return str.normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  };
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -94,20 +119,23 @@ const Dashboard = () => {
     if (selectedServicos.length === 0) {
       errors.servicos = "Selecione pelo menos um procedimento.";
     }
+    const clienteSelecionado = searchResults.find(cliente => cliente.nome === formData.nome);
+    if (!clienteSelecionado) {
+      errors.cadastro = "Cadastre um novo cliente ou selecione um existente.";
+    }
   
     setFormErrors(errors); // Atualiza os erros no estado
   
     return Object.keys(errors).length === 0; // Retorna true apenas se não houver erros
   };
   
-  // Buscar dados do profissional e agendamentos
   useEffect(() => {
-    const fetchData = async () => {
-      if (dadosDashboard?.events?.length) return; // Verifique se o contexto já tem dados
+    let isMounted = true; // Flag para controle de desmontagem do componente
   
-      setLoading(true);
+    const fetchAgendamentos = async () => {
       try {
-        // Fetch data da API
+        setLoading(true);
+  
         const agendamentosResponse = await api.get(`/v1/profissional/${user.uid}/agendamentos`);
         const formattedEvents = agendamentosResponse.data.map((event) => {
           const start = new Date(event.horario.inicio._seconds * 1000);
@@ -116,25 +144,54 @@ const Dashboard = () => {
           return { ...event, title, start, end };
         });
   
-        const profissionalResponse = await api.get(`/v1/profissional/${user.uid}`);
-        setDadosDashboard({
-          events: formattedEvents,
-          horarioFuncionamento: profissionalResponse.data.horario_funcionamento || {},
-          nome: profissionalResponse.data.nome,
-          servicosDisponiveis: profissionalResponse.data.servicos || [],
-          dadosProfissional: profissionalResponse.data,
-        });
+        if (isMounted) {
+          setDadosDashboard((prev) => ({
+            ...prev,
+            events: formattedEvents,
+          }));
+        }
+  
       } catch (error) {
-        console.error("Erro ao carregar dados do dashboard:", error);
-        setError("Erro ao carregar os dados do dashboard.");
+        console.error("Erro ao buscar agendamentos:", error);
+        setError("Erro ao carregar os agendamentos.");
       } finally {
-        setLoading(false);
+        if (isMounted) setLoading(false);
       }
     };
   
-    fetchData();
-  }, [dadosDashboard, setDadosDashboard, setError, user.uid]); 
-
+    const fetchDadosProfissional = async () => {
+      try {
+        setLoading(true);
+  
+        const profissionalResponse = await api.get(`/v1/profissional/${user.uid}`);
+        const profissionalData = profissionalResponse.data;
+  
+        if (isMounted) {
+          setDadosDashboard((prev) => ({
+            ...prev,
+            horarioFuncionamento: profissionalData.horario_funcionamento || {},
+            nome: profissionalData.nome,
+            servicosDisponiveis: profissionalData.servicos || [],
+            dadosProfissional: profissionalData,
+          }));
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados do profissional:", error);
+        setError("Erro ao carregar os dados do profissional.");
+      } finally {
+        if (isMounted) setLoading(false);
+      }
+    };
+  
+    // Chamadas separadas
+    fetchAgendamentos();
+    fetchDadosProfissional();
+  
+    return () => {
+      isMounted = false; // Cleanup
+    };
+  }, [user.uid, setDadosDashboard, setError]);
+  
   if (loading) {
     return (
       <div className={style["loading-container"]}>
@@ -143,7 +200,7 @@ const Dashboard = () => {
       </div>
     );
   }
-
+  
   const handleServicoChange = (e) => {
     const { value, checked } = e.target;
     setSelectedServicos((prev) =>
@@ -168,6 +225,7 @@ const Dashboard = () => {
   
     try {
       const novoHorario = {
+        id: formData.id,
         horario: [`${formData.data}T${formData.start}:00`],
         nome: formData.nome,
         servicos: selectedServicos,
@@ -199,10 +257,66 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  const handleSearchChange = (e) => {
+    const value = e.target.value;
+    setSearchTerm(value);
+    setFormData((prev) => ({ ...prev, nome: value })); // Atualiza o formData
+
+    if (value.length >= 3) {
+      const filteredResults = clientes.filter((cliente) =>
+        removeAcentos(cliente.nome.toLowerCase()).includes(removeAcentos(value.toLowerCase()))
+      );
+      setSearchResults(filteredResults);
+      setShowResults(true);
+    } else {
+      setSearchResults([]);
+      setShowResults(false);
+    }
+  };
+
+  // Seleciona um cliente
+  const handleSelectCliente = (cliente) => {
+    setFormData((prev) => ({
+      ...prev,
+      nome: cliente.nome,
+      cpf: cliente.cpf,
+      email: cliente.email,
+      telefone: cliente.telefone,
+      id: cliente.id
+    }));
+    setSearchTerm(cliente.nome); // Atualiza o campo de busca
+    setShowResults(false); // Fecha o modal
+  };
   
   return (
     <div>
       <h1>Agenda de {nome || "Profissional"}</h1>
+
+      {!dadosDashboard.horarioFuncionamento || 
+        Object.keys(dadosDashboard.horarioFuncionamento).length === 0 ||
+        Object.values(dadosDashboard.horarioFuncionamento).every(value => value === null) //se todos os dias forem null
+      ? (
+        <div className={styles.noDataContainer}>
+          <h2>Você não definiu seus horários de funcionamento</h2   >
+          <p>
+            Clique <Link to="/horario" className={styles.link}>aqui</Link> para definir!
+          </p>
+        </div>
+      ) : null}
+
+      {Object.values(dadosDashboard.horarioFuncionamento).some(value => value !== null) && !dadosDashboard.events?.length && (
+        <div className={styles.noDataContainer}>
+          <h2>Você não possui agendamentos marcados</h2>
+          <p>Clique no botão na parte inferior da tela para adicionar novos horários!</p>
+          <button
+            className={styles.addButton}
+            onClick={() => setShowModal(true)} // Abre modal para adicionar agendamento
+          >
+            <FaPlus />
+          </button>
+        </div>
+      )}
 
       <button
         onClick={() => setShowModal(true)}
@@ -226,17 +340,42 @@ const Dashboard = () => {
             <form onSubmit={handleAddHorario}>
 
             <div className={styles.inputGroup}>
-                <label>Nome do Cliente*:</label>
-                <input
-                  type="text"
-                  name="nome"
-                  placeholder="ex: João Carlos Silva"
-                  value={formData.nome}
-                  onChange={handleInputChange}
-                  required
-                />
-                {formErrors.nome && <p className={styles.errorMessage}>{formErrors.nome}</p>}
-              </div>
+              <label>Nome do Cliente*:</label>
+              <input 
+                style={{ marginBottom: showResults ? "0" : "10px"}}
+                type="text"
+                name="nome"
+                placeholder="ex: João Carlos Silva"
+                value={searchTerm}
+                onChange={handleSearchChange}
+                required
+              />
+
+              {/* Exibição de resultados */}
+              {showResults && (
+                <div className={styles.searchResults}>
+                  {searchResults.map((cliente) => (
+                    <div
+                      key={cliente.id}
+                      className={styles.searchResultItem}
+                      onClick={() => handleSelectCliente(cliente)}
+                    >
+                      <p>
+                        <strong>{cliente.nome}</strong>
+                      </p>
+                      <p>{cliente.email}</p>
+                    </div>
+                  ))}
+                  <p className={styles.addClientePrompt}>
+                    Não encontrou seu cliente?{" "}
+                    <Link to="/clientes" className={styles.addClienteLink}>
+                      Cadastre
+                    </Link>
+                  </p>
+                </div>
+              )}
+            </div>
+            {formErrors.cadastro && <p className={styles.errorMessage}>{formErrors.cadastro}</p>}
 
               <div className={styles.inputGroup}>
                 <label>Data*:</label>
@@ -357,6 +496,9 @@ const Dashboard = () => {
                     setFormErrors({});
                     setHorarioFinal("");
                     setValorTotal(0);
+                    setSearchTerm("");
+                    setSearchResults([]);
+                    setShowResults(false);
                   }}
                 >
                   Cancelar
